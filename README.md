@@ -18,7 +18,8 @@ A single self-contained static page. No build step, no dependencies, no framewor
 ├── index.html        # the entire site
 ├── assets/
 │   ├── favicon.svg   # browser tab mark
-│   └── og.svg        # social preview card
+│   ├── og.svg        # social preview card, source
+│   └── og.png        # 1200x630 render of the above; this is what og:image points at
 ├── CNAME             # custom domain for GitHub Pages
 ├── .nojekyll         # skip Jekyll processing on Pages
 └── README.md
@@ -97,11 +98,21 @@ at iPhone SE 375, iPhone 14 Pro 393, Pixel 7 412, Galaxy S8 360 and a 320px Andr
 ## Known follow-ups
 
 - [ ] Point DNS at the host (see *Deploying*).
-- [ ] `og:image` is an SVG. Most social platforms (X, LinkedIn, WhatsApp) will not render
-      SVG previews — export `assets/og.svg` to a 1200×630 PNG and update the two
-      `og:image` / `twitter:image` tags.
 - [ ] Optional: self-host the two Google Fonts to drop the third-party request.
 - [ ] Optional: add real customer proof once there is some to publish.
+
+## Social preview
+
+`og:image` points at `assets/og.png` (1200x630). Social platforms do not render SVG
+previews, so the PNG is the one that matters. To regenerate it after editing
+`assets/og.svg`:
+
+```bash
+chrome --headless=new --window-size=1200,630 --force-device-scale-factor=1        --screenshot=assets/og.png og-wrapper.html
+```
+
+where `og-wrapper.html` is a minimal page that loads the Inter webfont and inlines the
+SVG — otherwise the text falls back to a system font and the render drifts from the site.
 
 ## Contact
 
