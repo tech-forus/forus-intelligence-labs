@@ -77,8 +77,22 @@ Deliberate choices worth knowing about:
   (`--fc` blue + amber, `--fb` violet + pink), sampled from the live products.
 - **Adding a third venture:** copy an `<article class="vcard">` block, give it a new
   modifier class, and define `--glow` plus `.rule` gradient stops for it.
-- **Animation** respects `prefers-reduced-motion`.
-- The layout is responsive down to 360px; there is no horizontal page scroll.
+- **Animation** respects `prefers-reduced-motion`, and hover effects are disabled
+  under `@media (hover: none)` so nothing sticks on a touchscreen.
+- **Phone layout** lives in the `PHONE` block at the end of `<style>`. Breakpoints are
+  900px (nav drawer takes over), 760px (single column, full-width buttons), 520px and
+  400px. Safe-area insets are handled for notched devices via `env(safe-area-inset-*)`.
+
+### Verified on device
+
+Checked under real mobile viewport emulation (Chrome DevTools Protocol, touch enabled)
+at iPhone SE 375, iPhone 14 Pro 393, Pixel 7 412, Galaxy S8 360 and a 320px Android:
+
+- no horizontal scroll and no element crossing the viewport edge at any width
+- burger is a 44x44 target; drawer links are 54px tall; footer links are 44px
+- drawer opens flush under the sticky header, dims the page behind it, locks body
+  scroll, and closes on link tap, scrim tap, `Escape`, or resize past 900px
+- every `auto-fit` grid divides its item count evenly, so no orphan cells appear
 
 ## Known follow-ups
 

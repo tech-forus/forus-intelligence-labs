@@ -148,7 +148,7 @@ h2.sec{
 @keyframes pulse{0%,100%{box-shadow:0 0 0 3px rgba(52,211,153,.16)}50%{box-shadow:0 0 0 7px rgba(52,211,153,0)}}
 
 /* ---------- hero ---------- */
-.hero{padding:104px 0 88px;position:relative}
+.hero{padding:104px 0 44px;position:relative}
 .hero h1{
   font-size:clamp(42px,7.4vw,80px);line-height:1.02;letter-spacing:-.045em;
   font-weight:800;margin:22px 0 26px;max-width:16ch;
@@ -174,7 +174,7 @@ h2.sec{
   margin-top:74px;border:1px solid var(--line-soft);border-radius:var(--r-lg);
   background:var(--line-soft);overflow:hidden;
 }
-.hero-strip div{background:var(--bg-2);padding:24px 22px}
+.hero-strip > div{background:var(--bg-2);padding:26px 22px 28px}
 .hero-strip .k{font-size:clamp(24px,3.2vw,32px);font-weight:700;letter-spacing:-.03em;line-height:1.1}
 .hero-strip .v{font-size:12.5px;color:var(--muted);margin-top:5px;line-height:1.45}
 @media(max-width:760px){.hero-strip{grid-template-columns:repeat(2,1fr)}}
@@ -221,8 +221,8 @@ h2.sec{
 .vtag{font-size:19px;line-height:1.5;color:var(--text);font-weight:500;letter-spacing:-.012em;margin:0 0 14px;max-width:56ch}
 .vdesc{font-size:15.5px;color:var(--text-2);max-width:66ch;margin:0 0 28px;line-height:1.66}
 
-.feats{display:grid;grid-template-columns:repeat(auto-fit,minmax(232px,1fr));gap:1px;background:var(--line-soft);border:1px solid var(--line-soft);border-radius:var(--r);overflow:hidden;margin-bottom:28px}
-.feat{background:var(--bg-2);padding:19px 20px;transition:background .3s}
+.feats{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:1px;background:var(--line-soft);border:1px solid var(--line-soft);border-radius:var(--r);overflow:hidden;margin-bottom:28px}
+.feat{background:var(--bg-2);padding:20px 21px;transition:background .3s}
 .feat:hover{background:var(--surface-2)}
 .feat h4{margin:0 0 6px;font-size:14px;font-weight:600;letter-spacing:-.01em;display:flex;align-items:center;gap:9px}
 .feat h4 i{width:5px;height:5px;border-radius:50%;flex:0 0 5px;background:var(--acc)}
@@ -260,7 +260,7 @@ h2.sec{
 .vbtn-2:hover{border-color:#39414f;color:var(--text);background:rgba(255,255,255,.035)}
 
 /* ---------- platform / capability grid ---------- */
-.cap-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));gap:1px;background:var(--line-soft);border:1px solid var(--line-soft);border-radius:var(--r-lg);overflow:hidden;margin-top:52px}
+.cap-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:1px;background:var(--line-soft);border:1px solid var(--line-soft);border-radius:var(--r-lg);overflow:hidden;margin-top:52px}
 .cap{background:var(--bg-2);padding:30px 28px;transition:background .35s var(--ease);position:relative}
 .cap:hover{background:var(--surface)}
 .cap .ico{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;border:1px solid var(--line);background:var(--surface-2);margin-bottom:17px}
@@ -314,7 +314,154 @@ footer{border-top:1px solid var(--line-soft);padding:64px 0 40px;position:relati
 .f-bot a{color:var(--muted)}
 .f-bot a:hover{color:var(--text)}
 
-@media(max-width:640px){section{padding:74px 0}.hero{padding:70px 0 60px}}
+/* ============================================================
+   PHONE
+   Handset-first pass: real nav, thumb-sized targets, safe areas,
+   and grids that never leave an orphan cell.
+   ============================================================ */
+
+/* burger + drawer (hidden on desktop) */
+.burger{display:none;flex-direction:column;width:44px;height:44px;margin-right:-10px;border:0;background:none;padding:0;cursor:pointer;color:var(--text);align-items:center;justify-content:center;border-radius:11px;-webkit-tap-highlight-color:transparent}
+.burger:active{background:rgba(255,255,255,.06)}
+.burger span{display:block;width:20px;height:1.8px;background:currentColor;border-radius:2px;transition:transform .32s var(--ease),opacity .2s var(--ease)}
+.burger span+span{margin-top:5.4px}
+.burger[aria-expanded="true"] span:nth-child(1){transform:translateY(7.2px) rotate(45deg)}
+.burger[aria-expanded="true"] span:nth-child(2){opacity:0}
+.burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-7.2px) rotate(-45deg)}
+.drawer,.scrim{display:none}
+
+@media(max-width:900px){
+  .burger{display:flex}
+  .nav-links{display:none}
+  header.nav{border-bottom:1px solid var(--line-soft)}
+  .nav-in>.nav-cta{display:none}
+
+  .drawer{
+    display:block;position:absolute;left:0;right:0;top:100%;z-index:55;
+    background:#0a0c11;
+    border-bottom:1px solid var(--line);
+    padding:10px 0 max(20px,env(safe-area-inset-bottom));
+    max-height:0;overflow:hidden;visibility:hidden;
+    transition:max-height .38s var(--ease),visibility .38s,opacity .28s var(--ease);
+    opacity:0;
+  }
+  .drawer.open{max-height:calc(100dvh - var(--navh,60px));visibility:visible;opacity:1;overflow-y:auto}
+  /* dim the page behind the open drawer; lives outside the header so it can be viewport-fixed */
+  .scrim{
+    display:block;position:fixed;inset:0;z-index:50;background:rgba(4,5,7,.62);
+    backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
+    opacity:0;visibility:hidden;transition:opacity .32s var(--ease),visibility .32s;
+  }
+  .scrim.open{opacity:1;visibility:visible}
+  .drawer nav{display:flex;flex-direction:column;padding-inline:24px}
+  .drawer nav a{
+    display:flex;align-items:center;justify-content:space-between;
+    min-height:54px;font-size:17px;font-weight:550;color:var(--text);
+    border-bottom:1px solid var(--line-soft);letter-spacing:-.012em;
+  }
+  .drawer nav a span{color:var(--faint);font-size:15px}
+  .drawer .d-cta{display:grid;gap:10px;padding:20px 24px 4px}
+  .drawer .d-cta a{
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    min-height:50px;border-radius:13px;font-size:15.5px;font-weight:650;
+  }
+  .drawer .d-fc{background:linear-gradient(96deg,#60a5fa,#3b82f6);color:#08090c}
+  .drawer .d-fb{background:linear-gradient(96deg,#a58fff,#8b73ff);color:#08090c}
+  .drawer .d-mail{border:1px solid var(--line);color:var(--text)}
+  body.locked{overflow:hidden}
+}
+
+@media(max-width:900px){
+  /* steps: explicit columns so 4 items never orphan one */
+  .steps{grid-template-columns:1fr 1fr;gap:30px 26px}
+  .band{padding:52px 30px}
+}
+
+@media(max-width:760px){
+  .wrap{padding-inline:20px}
+  section{padding:70px 0}
+  .hero{padding:52px 0 34px}
+  .hero h1{font-size:clamp(34px,10vw,46px);letter-spacing:-.034em;line-height:1.06;max-width:none;margin:18px 0 20px}
+  .hero p.lede{font-size:16.5px;line-height:1.62;margin-bottom:30px}
+  h2.sec{font-size:clamp(27px,7.6vw,36px);letter-spacing:-.026em}
+  .sec-lede{font-size:16px}
+
+  /* buttons go full width and thumb-sized */
+  .hero-cta{gap:11px}
+  .hero-cta .btn{width:100%;justify-content:center;min-height:52px;font-size:15.5px;padding:14px 22px}
+  .vactions{gap:10px}
+  .vactions .vbtn,.vactions .vbtn-2{width:100%;justify-content:center;min-height:50px}
+
+  .hero-strip{margin-top:44px;grid-template-columns:1fr 1fr}
+  .hero-strip>div{padding:20px 18px 22px}
+  .hero-strip .k{font-size:26px}
+  .hero-strip .v{font-size:12px}
+
+  .vbody{padding:28px 20px 26px}
+  .vhead{gap:14px;margin-bottom:18px}
+  .vname{font-size:20px}
+  .vtag{font-size:17px;margin-bottom:12px}
+  .vdesc{font-size:15px;margin-bottom:24px}
+  .vlogo{width:44px;height:44px;flex-basis:44px;border-radius:12px}
+  .vlogo svg{width:23px;height:23px}
+
+  .cap{padding:26px 22px}
+  .step{padding-top:22px}
+  .steps{grid-template-columns:1fr;gap:0}
+  .step{border-top:1px solid var(--line);padding:22px 0 26px}
+  .step:last-child{padding-bottom:0}
+
+  /* drop the auto-fit min track: a 290px floor overflows a 320px phone */
+  .feats,.cap-grid{grid-template-columns:1fr}
+
+  /* thumb-sized targets in the header and footer */
+  .brand{min-height:44px}
+  .f-grid{gap:30px;margin-bottom:38px}
+  .f-grid ul{gap:0}
+  .f-grid a{display:flex;align-items:center;min-height:44px}
+  .f-about .brand{min-height:auto}
+  footer{padding:52px 0 34px}
+}
+
+@media(max-width:520px){
+  .brand{font-size:14.5px;gap:9px}
+  .brand .mark{width:27px;height:27px;flex-basis:27px}
+  .brand small{font-size:9.5px;letter-spacing:.14em}
+  .band{padding:40px 22px}
+  .band .hero-cta .btn{width:100%}
+  .f-grid{grid-template-columns:1fr 1fr}
+  .f-about{grid-column:1/-1}
+  .f-bot{flex-direction:column;align-items:flex-start;gap:9px;font-size:12.5px}
+}
+
+@media(max-width:400px){
+  .wrap{padding-inline:16px}
+  .hero h1{font-size:32px}
+  .vbody{padding:24px 17px 24px}
+  .feat{padding:18px 17px}
+  .cap{padding:22px 18px}
+  .chip{font-size:11.5px;padding:6px 10px}
+  .stack span{font-size:11.5px;padding:6px 11px}
+  .badges{gap:6px}
+  .badge{font-size:10px;padding:4px 8px}
+}
+
+/* notch / gesture-bar safe areas */
+@supports(padding:max(0px)){
+  .wrap{padding-left:max(20px,env(safe-area-inset-left));padding-right:max(20px,env(safe-area-inset-right))}
+  footer{padding-bottom:max(34px,calc(env(safe-area-inset-bottom) + 22px))}
+}
+
+/* touch devices: no sticky hover states, no parallax cost */
+@media(hover:none){
+  .vcard:hover,.btn:hover,.vbtn:hover,.chip:hover,.nav-cta:hover{transform:none;box-shadow:none}
+  .vcard::before{display:none}
+  .orb{opacity:.34;filter:blur(80px)}
+  .nav-links a::after{display:none}
+  a,button{-webkit-tap-highlight-color:rgba(255,255,255,.07)}
+}
+
+@media(max-width:640px){section{padding:70px 0}}
 </style>
 </head>
 <body>
@@ -346,8 +493,27 @@ footer{border-top:1px solid var(--line-soft);padding:64px 0 40px;position:relati
       <a href="#stack">Stack</a>
     </nav>
     <a class="nav-cta" href="#contact">Get in touch</a>
+    <button class="burger" id="burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="drawer">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="drawer" id="drawer">
+    <nav aria-label="Mobile">
+      <a href="#ventures">Ventures <span>2</span></a>
+      <a href="#platform">Platform</a>
+      <a href="#approach">Approach</a>
+      <a href="#stack">Stack</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <div class="d-cta">
+      <a class="d-fc" href="https://freightcompare.ai" target="_blank" rel="noopener noreferrer">Open FreightCompare &#8599;</a>
+      <a class="d-fb" href="https://forusbiz.ai" target="_blank" rel="noopener noreferrer">Open ForusBiz &#8599;</a>
+      <a class="d-mail" href="mailto:tech@foruselectric.com">Email the team</a>
+    </div>
   </div>
 </header>
+
+<div class="scrim" id="scrim" hidden></div>
 
 <main id="top">
 
@@ -744,6 +910,48 @@ footer{border-top:1px solid var(--line-soft);padding:64px 0 40px;position:relati
 
   // current year
   document.getElementById('yr').textContent = new Date().getFullYear();
+
+  // ---- mobile drawer ----
+  var burger = document.getElementById('burger');
+  var drawer = document.getElementById('drawer');
+  var scrim = document.getElementById('scrim');
+  scrim.removeAttribute('hidden');
+
+  // publish the real nav height so the drawer sits flush beneath it
+  var setNavH = function () {
+    document.documentElement.style.setProperty('--navh', nav.offsetHeight + 'px');
+  };
+  setNavH();
+  window.addEventListener('resize', setNavH);
+  window.addEventListener('orientationchange', function () { setTimeout(setNavH, 120); });
+
+  var setMenu = function (open) {
+    burger.setAttribute('aria-expanded', String(open));
+    burger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    drawer.classList.toggle('open', open);
+    scrim.classList.toggle('open', open);
+    document.body.classList.toggle('locked', open);
+  };
+
+  burger.addEventListener('click', function () {
+    setMenu(burger.getAttribute('aria-expanded') !== 'true');
+  });
+
+  // any tap inside the drawer closes it; in-page links get to scroll first
+  drawer.addEventListener('click', function (e) {
+    if (e.target.closest('a')) setMenu(false);
+  });
+
+  scrim.addEventListener('click', function () { setMenu(false); });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') setMenu(false);
+  });
+
+  // close when the viewport grows back past the mobile breakpoint
+  var mq = window.matchMedia('(min-width: 901px)');
+  var onMQ = function (e) { if (e.matches) setMenu(false); };
+  mq.addEventListener ? mq.addEventListener('change', onMQ) : mq.addListener(onMQ);
 })();
 </script>
 
