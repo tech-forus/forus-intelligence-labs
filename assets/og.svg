@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8b73ff"/><stop offset=".55" stop-color="#3b82f6"/><stop offset="1" stop-color="#34d399"/>
+    </linearGradient>
+    <radialGradient id="o1" cx="50%" cy="50%">
+      <stop offset="0" stop-color="#3b82f6" stop-opacity=".38"/><stop offset="1" stop-color="#3b82f6" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="o2" cx="50%" cy="50%">
+      <stop offset="0" stop-color="#8b73ff" stop-opacity=".34"/><stop offset="1" stop-color="#8b73ff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="#08090c"/>
+  <circle cx="130" cy="90" r="420" fill="url(#o1)"/>
+  <circle cx="1090" cy="120" r="400" fill="url(#o2)"/>
+  <g transform="translate(88,150)">
+    <rect x="0" y="0" width="72" height="72" rx="20" fill="none" stroke="url(#g)" stroke-width="3.4"/>
+    <path d="M24 52V25h25" stroke="url(#g)" stroke-width="5.6" stroke-linecap="round" fill="none"/>
+    <path d="M24 38h17" stroke="url(#g)" stroke-width="5.6" stroke-linecap="round" fill="none"/>
+    <circle cx="51" cy="50" r="6.4" fill="url(#g)"/>
+  </g>
+  <text x="88" y="310" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="72" font-weight="800" fill="#e9ebef" letter-spacing="-2.6">Forus Intelligence Labs</text>
+  <text x="88" y="382" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="31" font-weight="500" fill="#a9b1c1">Applied AI for the businesses that actually move things.</text>
+  <g font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="26" font-weight="600">
+    <rect x="88" y="450" width="286" height="62" rx="16" fill="none" stroke="#2b3444"/>
+    <text x="118" y="490" fill="#93b8fb">freightcompare.ai</text>
+    <rect x="398" y="450" width="228" height="62" rx="16" fill="none" stroke="#2b3444"/>
+    <text x="428" y="490" fill="#c0b1ff">forusbiz.ai</text>
+  </g>
+  <text x="88" y="580" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="22" font-weight="500" fill="#5a6274" letter-spacing="3">FORUSINTELLIGENCELABS.COM</text>
+</svg>
