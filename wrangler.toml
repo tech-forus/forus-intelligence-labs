@@ -22,7 +22,7 @@ crons = ["17 * * * *"]
 [vars]
 CAREERS_FROM_NAME = "Forus Intelligence Labs Careers"
 CAREERS_REPLY_TO = "tech@foruselectric.com"
-CAREERS_FROM_EMAIL = ""
+CAREERS_FROM_EMAIL = "careers@forusintelligencelabs.com"
 
 [observability]
 enabled = true
