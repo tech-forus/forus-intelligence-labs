@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Careers at Forus Intelligence Labs</title>
+<meta name="description" content="Join Forus Intelligence Labs. Open roles: Software Developer (MERN, FreightCompare and ForusBiz) and Hardware Innovator (electronics, firmware, power)." />
+<link rel="canonical" href="https://forusintelligencelabs.com/careers/" />
+<meta name="theme-color" content="#08090c" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Forus Intelligence Labs" />
+<meta property="og:url" content="https://forusintelligencelabs.com/careers/" />
+<meta property="og:title" content="Careers at Forus Intelligence Labs" />
+<meta property="og:description" content="Two open roles: Software Developer and Hardware Innovator. Show us what you have built." />
+<meta property="og:image" content="https://forusintelligencelabs.com/assets/og.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/assets/site.css" />
+<style>
+.c-hero{padding:96px 0 30px}
+.c-hero h1{font-size:clamp(38px,6.4vw,68px);line-height:1.04;letter-spacing:-.042em;font-weight:800;margin:20px 0 22px;max-width:17ch}
+.c-hero p{font-size:clamp(16.5px,1.9vw,19px);color:var(--text-2);max-width:62ch;margin:0}
+.c-section{padding:56px 0}
+
+/* openings */
+.openings{display:grid;gap:22px}
+.opening{border:1px solid var(--line);border-radius:var(--r-lg);background:linear-gradient(180deg,var(--surface),var(--bg-2));overflow:hidden;scroll-margin-top:90px}
+.opening .rule{height:2px;background:linear-gradient(90deg,var(--a1),var(--a2),transparent 82%)}
+.opening.sw{--a1:var(--fc);--a2:var(--fb)}
+.opening.hw{--a1:#34d399;--a2:var(--fc-2)}
+.o-body{padding:36px 38px 32px}
+.o-head{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;align-items:flex-start;margin-bottom:16px}
+.o-head h2{margin:6px 0 0;font-size:clamp(24px,3vw,30px);letter-spacing:-.03em;font-weight:700;line-height:1.15}
+.o-lede{font-size:16.5px;color:var(--text-2);max-width:68ch;margin:0 0 26px}
+.o-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line-soft);border:1px solid var(--line-soft);border-radius:var(--r);overflow:hidden;margin-bottom:26px}
+.o-cols>div{background:var(--bg-2);padding:22px 22px 20px}
+.o-cols h4{margin:0 0 10px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);font-weight:600}
+.o-cols ul{margin:0;padding:0 0 0 18px;display:grid;gap:7px}
+.o-cols li{font-size:14px;color:var(--text-2);line-height:1.55}
+.o-cols li::marker{color:var(--faint)}
+.o-foot{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.o-foot .meta{font-size:13px;color:var(--muted)}
+.prio{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 0 26px}
+.prio div{border:1px solid var(--line-soft);border-radius:12px;padding:14px 16px;background:rgba(255,255,255,.015)}
+.prio b{display:block;font-size:13.5px;margin-bottom:3px}
+.prio span{font-size:13px;color:var(--muted);line-height:1.5}
+.prio .fc b{color:#93b8fb}.prio .fb b{color:#c0b1ff}
+
+/* form */
+.apply{border:1px solid var(--line);border-radius:var(--r-lg);background:var(--bg-2);padding:40px 38px;scroll-margin-top:84px}
+.apply h2{margin:0 0 6px;font-size:clamp(26px,3.4vw,34px);letter-spacing:-.03em}
+.apply .sub{color:var(--muted);font-size:14.5px;margin:0 0 30px}
+.f-step{border-top:1px solid var(--line-soft);padding:26px 0 4px}
+.f-step:first-of-type{border-top:0;padding-top:0}
+.f-step>h3{margin:0 0 16px;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);font-weight:600}
+.role-pick{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.role-pick label{position:relative;cursor:pointer;border:1px solid var(--line);border-radius:14px;padding:18px 18px 16px;background:var(--surface);transition:border-color .2s,background .2s}
+.role-pick input{position:absolute;opacity:0;pointer-events:none}
+.role-pick b{display:block;font-size:16px;margin-bottom:3px}
+.role-pick span{font-size:13px;color:var(--muted)}
+.role-pick label:has(input:checked){border-color:#60a5fa;background:rgba(59,130,246,.08)}
+.role-pick label.hwr:has(input:checked){border-color:#34d399;background:rgba(52,211,153,.07)}
+.role-pick label:has(input:focus-visible){outline:2px solid #60a5fa;outline-offset:2px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px 16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 16px}
+.fld{display:flex;flex-direction:column;gap:6px;min-width:0}
+.fld.full{grid-column:1/-1}
+.fld>span{font-size:13px;color:var(--text-2);font-weight:500}
+.fld>span em{font-style:normal;color:var(--faint);font-weight:400}
+.fld input,.fld select,.fld textarea{font:inherit;font-size:15px;color:var(--text);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:11px 13px;min-height:46px;width:100%;transition:border-color .2s,box-shadow .2s}
+.fld textarea{min-height:130px;resize:vertical;line-height:1.55}
+.fld input:focus,.fld select:focus,.fld textarea:focus{outline:0;border-color:#5b8def;box-shadow:0 0 0 3px rgba(59,130,246,.18)}
+.fld select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%;background-size:5px 5px;background-repeat:no-repeat;padding-right:34px}
+.fld .hint{font-size:12px;color:var(--faint)}
+.checks{display:flex;flex-wrap:wrap;gap:8px}
+.checks label{position:relative;cursor:pointer;display:inline-flex;align-items:center;gap:7px;font-size:13.5px;color:var(--text-2);border:1px solid var(--line);border-radius:999px;padding:8px 13px;background:var(--surface);transition:border-color .2s,color .2s,background .2s;min-height:38px}
+.checks input{position:absolute;opacity:0;pointer-events:none}
+.checks label:has(input:checked){border-color:#5b8def;color:var(--text);background:rgba(59,130,246,.1)}
+.checks label:has(input:focus-visible){outline:2px solid #60a5fa;outline-offset:2px}
+.checks label:has(input:checked)::before{content:"\2713";font-size:12px;color:#93b8fb}
+.drop{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;border:1.5px dashed var(--line);border-radius:14px;padding:26px 18px;background:var(--surface);cursor:pointer;transition:border-color .2s,background .2s}
+.drop.over,.drop:hover{border-color:#5b8def;background:rgba(59,130,246,.05)}
+.drop input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.drop b{font-size:15px}
+.drop span{font-size:12.5px;color:var(--muted)}
+.drop.has b{color:#34d399}
+.consent{display:flex;gap:11px;align-items:flex-start;font-size:13.5px;color:var(--text-2);line-height:1.55;cursor:pointer}
+.consent input{margin-top:3px;width:18px;height:18px;flex:0 0 18px;accent-color:#3b82f6}
+.hp{position:absolute!important;left:-9999px!important;width:1px;height:1px;overflow:hidden}
+.f-actions{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-top:24px}
+.f-actions button{font:inherit;cursor:pointer;border:0}
+.f-err{color:#fca5a5;font-size:14px;margin:0}
+.f-ok{display:none;text-align:center;padding:30px 10px}
+.f-ok .tick{width:58px;height:58px;border-radius:50%;margin:0 auto 18px;display:grid;place-items:center;background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.4);color:#34d399;font-size:26px}
+.f-ok h3{margin:0 0 8px;font-size:24px;letter-spacing:-.02em}
+.f-ok p{margin:0 auto;color:var(--text-2);max-width:48ch}
+.apply.done form{display:none}.apply.done .f-ok{display:block}
+[hidden]{display:none!important}
+
+@media(max-width:900px){.o-cols{grid-template-columns:1fr}.grid3{grid-template-columns:1fr 1fr}}
+@media(max-width:760px){
+  .c-hero{padding:48px 0 18px}
+  .c-section{padding:36px 0}
+  .o-body{padding:26px 20px 24px}
+  .apply{padding:28px 20px}
+  .role-pick,.grid2,.grid3,.prio{grid-template-columns:1fr}
+  .o-foot .btn,.f-actions .btn{width:100%;justify-content:center;min-height:52px}
+}
+</style>
+</head>
+<body>
+
+<div class="field" aria-hidden="true">
+  <div class="orb a"></div><div class="orb b"></div>
+</div>
+
+<header class="nav" id="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="/" aria-label="Forus Intelligence Labs home">
+      <svg class="mark" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="bm" x1="0" y1="0" x2="32" y2="32">
+            <stop offset="0" stop-color="#8b73ff"/><stop offset=".55" stop-color="#3b82f6"/><stop offset="1" stop-color="#34d399"/>
+          </linearGradient>
+        </defs>
+        <rect x="1" y="1" width="30" height="30" rx="9" stroke="url(#bm)" stroke-width="1.5"/>
+        <path d="M10.5 22V10h11" stroke="url(#bm)" stroke-width="2.4" stroke-linecap="round"/>
+        <path d="M10.5 16h7.5" stroke="url(#bm)" stroke-width="2.4" stroke-linecap="round"/>
+        <circle cx="22.5" cy="21.5" r="2.6" fill="url(#bm)"/>
+      </svg>
+      <span>Forus Intelligence Labs<small>APPLIED AI</small></span>
+    </a>
+    <nav class="nav-links">
+      <a href="/#ventures">Ventures</a>
+      <a href="/#platform">Platform</a>
+      <a href="/#approach">Approach</a>
+      <a href="#openings">Openings</a>
+    </nav>
+    <a class="nav-cta" href="#apply">Apply now</a>
+    <button class="burger" id="burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="drawer">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="drawer" id="drawer">
+    <nav aria-label="Mobile">
+      <a href="/">Home</a>
+      <a href="#software">Software Developer</a>
+      <a href="#hardware">Hardware Innovator</a>
+      <a href="/#ventures">Ventures <span>2</span></a>
+    </nav>
+    <div class="d-cta">
+      <a class="d-fc" href="#apply">Apply now</a>
+      <a class="d-mail" href="mailto:tech@foruselectric.com">Email the team</a>
+    </div>
+  </div>
+</header>
+
+<div class="scrim" id="scrim" hidden></div>
+
+<main id="top">
+
+  <section class="c-hero">
+    <div class="wrap rv">
+      <span class="pill"><i class="dot live"></i> 2 roles open</span>
+      <h1 class="grad">Build the software and hardware India's businesses run on.</h1>
+      <p>
+        We are a small team shipping two live platforms, FreightCompare and ForusBiz, and we are now building
+        hardware too. Everyone here builds. If you have made something real, we want to see it.
+      </p>
+    </div>
+  </section>
+
+  <section class="c-section" id="openings">
+    <div class="wrap">
+      <div class="openings">
+
+        <article class="opening sw rv" id="software">
+          <div class="rule"></div>
+          <div class="o-body">
+            <div class="o-head">
+              <div>
+                <span class="role-kicker mono">01 &mdash; SOFTWARE</span>
+                <h2>Software Developer</h2>
+              </div>
+              <div class="badges"><span class="badge live">Open</span></div>
+            </div>
+            <p class="o-lede">
+              Own features end to end across our two products: the React front end, the Node/Express API, the
+              MongoDB data model and the integrations in between. You will ship to production and talk to the people using it.
+            </p>
+            <div class="prio">
+              <div class="fc"><b>For FreightCompare</b><span>MERN plus real logistics, freight or supply-chain experience is our top priority.</span></div>
+              <div class="fb"><b>For ForusBiz</b><span>MERN plus ERP, accounting, inventory or GST/invoicing experience.</span></div>
+            </div>
+            <div class="o-cols">
+              <div>
+                <h4>You will</h4>
+                <ul>
+                  <li>Build product features from API to UI</li>
+                  <li>Integrate carriers, payments, maps and messaging</li>
+                  <li>Work on our LLM copilots and voice input</li>
+                  <li>Keep production fast and reliable</li>
+                </ul>
+              </div>
+              <div>
+                <h4>We look for</h4>
+                <ul>
+                  <li>Solid React, Node.js, Express, MongoDB</li>
+                  <li>Relevant experience, or projects that prove it</li>
+                  <li>Code you can show us (GitHub, live apps)</li>
+                  <li>Clear thinking and clear writing</li>
+                </ul>
+              </div>
+              <div>
+                <h4>Nice to have</h4>
+                <ul>
+                  <li>Logistics, freight or ERP domain knowledge</li>
+                  <li>TypeScript, Redis, cloud deploys</li>
+                  <li>Android / Capacitor or React Native</li>
+                  <li>LLM integrations</li>
+                </ul>
+              </div>
+            </div>
+            <div class="o-foot">
+              <span class="meta">Branches: CSE, IT, EEE &middot; with relevant experience</span>
+              <a class="btn btn-primary" href="#apply" data-role="software">Apply for this role
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <article class="opening hw rv" id="hardware">
+          <div class="rule"></div>
+          <div class="o-body">
+            <div class="o-head">
+              <div>
+                <span class="role-kicker mono">02 &mdash; HARDWARE</span>
+                <h2>Hardware Innovator</h2>
+              </div>
+              <div class="badges"><span class="badge live">Open</span></div>
+            </div>
+            <p class="o-lede">
+              We want exceptionally good makers: people who design a board, write its firmware, solder it, power it up,
+              find out why it does not work and fix it. Titles matter less than what is on your bench.
+            </p>
+            <div class="o-cols">
+              <div>
+                <h4>You will</h4>
+                <ul>
+                  <li>Take ideas from schematic to working prototype</li>
+                  <li>Design PCBs and write embedded firmware</li>
+                  <li>Work on power electronics and battery systems</li>
+                  <li>Test, measure, iterate, document</li>
+                </ul>
+              </div>
+              <div>
+                <h4>We look for</h4>
+                <ul>
+                  <li>Things you have actually built, with photos or repos</li>
+                  <li>PCB design (KiCad, Altium or similar)</li>
+                  <li>Embedded C on STM32, ESP32 or similar</li>
+                  <li>Comfort with a scope, a multimeter and an iron</li>
+                </ul>
+              </div>
+              <div>
+                <h4>Nice to have</h4>
+                <ul>
+                  <li>BMS, motor control or SMPS work</li>
+                  <li>Mechanical CAD and 3D printing</li>
+                  <li>Competition teams: SAE, Robocon, e-Yantra</li>
+                  <li>Anything that shipped to real users</li>
+                </ul>
+              </div>
+            </div>
+            <div class="o-foot">
+              <span class="meta">Branches: EEE, ECE &middot; freshers with strong builds welcome</span>
+              <a class="btn btn-primary" href="#apply" data-role="hardware">Apply for this role
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </a>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="c-section">
+    <div class="wrap">
+      <div class="apply rv" id="apply">
+        <form id="form" novalidate>
+          <h2>Apply</h2>
+          <p class="sub">Takes about five minutes. A real person on the tech team reads every application.</p>
+
+          <div class="f-step">
+            <h3>1 &middot; Role</h3>
+            <div class="role-pick">
+              <label><input type="radio" name="role" value="software" checked /><b>Software Developer</b><span>MERN &middot; CSE / IT / EEE</span></label>
+              <label class="hwr"><input type="radio" name="role" value="hardware" /><b>Hardware Innovator</b><span>Electronics &middot; EEE / ECE</span></label>
+            </div>
+          </div>
+
+          <div class="f-step">
+            <h3>2 &middot; About you</h3>
+            <div class="grid2">
+              <label class="fld"><span>Full name</span><input name="fullName" autocomplete="name" required maxlength="120" /></label>
+              <label class="fld"><span>Email</span><input name="email" type="email" autocomplete="email" required maxlength="160" /></label>
+              <label class="fld"><span>Phone</span><input name="phone" type="tel" autocomplete="tel" inputmode="tel" required maxlength="20" placeholder="+91" /></label>
+              <label class="fld"><span>Current city</span><input name="city" autocomplete="address-level2" maxlength="80" /></label>
+            </div>
+          </div>
+
+          <div class="f-step">
+            <h3>3 &middot; Education &amp; experience</h3>
+            <div class="grid3">
+              <label class="fld"><span>Degree</span>
+                <select name="degree"><option>B.Tech / B.E.</option><option>M.Tech / M.E.</option><option>BCA / MCA</option><option>B.Sc / M.Sc</option><option>Diploma</option><option>Other</option></select>
+              </label>
+              <label class="fld"><span>Branch</span>
+                <select name="branch" required><option value="">Select</option><option value="CSE">CSE</option><option value="IT">IT</option><option value="EEE">EEE</option><option value="ECE">ECE</option><option value="Other">Other</option></select>
+              </label>
+              <label class="fld"><span>Graduation year</span><input name="gradYear" type="number" inputmode="numeric" min="1980" max="2032" placeholder="2024" /></label>
+              <label class="fld"><span>College</span><input name="college" maxlength="160" /></label>
+              <label class="fld"><span>Years of relevant experience</span><input name="experienceYears" type="number" inputmode="decimal" min="0" max="40" step="0.5" value="0" /></label>
+              <label class="fld"><span>Notice period <em>(optional)</em></span>
+                <select name="noticePeriod"><option value="">Select</option><option>Immediate</option><option>15 days</option><option>30 days</option><option>60 days</option><option>90 days</option><option>Student / graduating</option></select>
+              </label>
+              <label class="fld full"><span>Current role &amp; company <em>(optional)</em></span><input name="currentRole" maxlength="160" placeholder="e.g. Full-stack developer at a logistics startup" /></label>
+            </div>
+          </div>
+
+          <div class="f-step">
+            <h3>4 &middot; Skills</h3>
+            <div class="fld full" style="margin-bottom:18px"><span>What you are genuinely good at</span>
+              <div class="checks" id="skills"></div>
+            </div>
+            <div class="fld full"><span>Domains you have worked in</span>
+              <div class="checks" id="domains"></div>
+            </div>
+          </div>
+
+          <div class="f-step">
+            <h3>5 &middot; Proof of work</h3>
+            <div class="grid3" style="margin-bottom:14px">
+              <label class="fld"><span>GitHub</span><input name="github" inputmode="url" maxlength="300" placeholder="github.com/you" /></label>
+              <label class="fld"><span>LinkedIn</span><input name="linkedin" inputmode="url" maxlength="300" placeholder="linkedin.com/in/you" /></label>
+              <label class="fld"><span>Portfolio / project link</span><input name="portfolio" inputmode="url" maxlength="300" placeholder="Drive, website, YouTube" /></label>
+            </div>
+            <label class="fld full"><span id="builtLabel">The best thing you have built or shipped</span>
+              <textarea name="built" maxlength="3000" required placeholder="What it was, what you did yourself, what was hard, and where we can see it."></textarea>
+              <span class="hint"><span id="builtCount">0</span> / 3000</span>
+            </label>
+          </div>
+
+          <div class="f-step">
+            <h3>6 &middot; Resume</h3>
+            <label class="drop" id="drop">
+              <input type="file" name="resume" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" required />
+              <b id="dropTitle">Drop your resume here, or tap to choose</b>
+              <span id="dropSub">PDF or Word &middot; up to 4 MB</span>
+            </label>
+            <div class="hp" aria-hidden="true"><label>Website <input name="website" tabindex="-1" autocomplete="off" /></label></div>
+            <label class="consent" style="margin-top:20px">
+              <input type="checkbox" name="consent" value="yes" required />
+              <span>I agree that Forus Intelligence Labs Private Limited may store and review my application and resume for hiring. I can ask for it to be deleted at any time by writing to tech@foruselectric.com.</span>
+            </label>
+          </div>
+
+          <div class="f-actions">
+            <button class="btn btn-primary" type="submit" id="submit">Submit application
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </button>
+            <p class="f-err" id="err" role="alert" hidden></p>
+          </div>
+        </form>
+
+        <div class="f-ok" aria-live="polite">
+          <div class="tick">&#10003;</div>
+          <h3>Application received</h3>
+          <p>Thanks, <span id="okName">there</span>. We read every application and will reach out by email or phone if it is a fit.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="f-grid">
+      <div class="f-about">
+        <a class="brand" href="/">
+          <svg class="mark" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+            <rect x="1" y="1" width="30" height="30" rx="9" stroke="url(#bm)" stroke-width="1.5"/>
+            <path d="M10.5 22V10h11" stroke="url(#bm)" stroke-width="2.4" stroke-linecap="round"/>
+            <path d="M10.5 16h7.5" stroke="url(#bm)" stroke-width="2.4" stroke-linecap="round"/>
+            <circle cx="22.5" cy="21.5" r="2.6" fill="url(#bm)"/>
+          </svg>
+          <span>Forus Intelligence Labs<small>APPLIED AI</small></span>
+        </a>
+        <p>Applied-AI product studio building software for Indian commerce, logistics and manufacturing.</p>
+      </div>
+      <div>
+        <h5>Ventures</h5>
+        <ul>
+          <li><a href="https://freightcompare.ai" target="_blank" rel="noopener noreferrer">FreightCompare &#8599;</a></li>
+          <li><a href="https://forusbiz.ai" target="_blank" rel="noopener noreferrer">ForusBiz &#8599;</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Company</h5>
+        <ul>
+          <li><a href="/#platform">Platform</a></li>
+          <li><a href="/#approach">Approach</a></li>
+          <li><a href="/careers/">Careers</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Contact</h5>
+        <ul>
+          <li><a href="mailto:tech@foruselectric.com">tech@foruselectric.com</a></li>
+          <li><a href="https://foruselectric.com" target="_blank" rel="noopener noreferrer">Forus Electric &#8599;</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="f-bot">
+      <span>&copy; <span id="yr">2026</span> Forus Intelligence Labs. All rights reserved.</span>
+      <span class="mono">forusintelligencelabs.com</span>
+    </div>
+  </div>
+</footer>
+
+<script src="/assets/site.js" defer></script>
+<script>
+(function () {
+  var SKILLS = {
+    software: ['React', 'Node.js', 'Express', 'MongoDB', 'TypeScript', 'Next.js', 'REST APIs', 'SQL / Postgres', 'Redis',
+      'Docker', 'AWS / cloud', 'React Native / Android', 'LLM / AI integrations', 'Testing (Jest / Playwright)'],
+    hardware: ['PCB design (KiCad / Altium)', 'Embedded C / C++', 'STM32 / ESP32', 'Arduino', 'Power electronics', 'BMS / battery packs',
+      'Motor control (BLDC / FOC)', 'CAN / I2C / SPI / UART', 'FPGA / Verilog', 'LTspice / Simulink',
+      'Mechanical CAD (SolidWorks / Fusion 360)', '3D printing / CNC', 'Soldering / SMD rework', 'Oscilloscope & lab testing', 'IoT / sensors']
+  };
+  var DOMAINS = {
+    software: ['Logistics / freight', 'Supply chain / warehousing', 'ERP / accounting', 'Inventory', 'GST / invoicing',
+      'E-commerce', 'Fintech / payments', 'B2B SaaS'],
+    hardware: ['EV / mobility', 'Energy / solar', 'Battery systems', 'Robotics', 'Drones', 'Consumer electronics', 'Industrial automation']
+  };
+  var BUILT = {
+    software: 'The best thing you have built or shipped',
+    hardware: 'Show us what you have made'
+  };
+
+  var form = document.getElementById('form');
+  var box = document.getElementById('apply');
+  var err = document.getElementById('err');
+  var submit = document.getElementById('submit');
+
+  function chips(el, name, items) {
+    var keep = {};
+    el.querySelectorAll('input:checked').forEach(function (i) { keep[i.value] = 1; });
+    el.innerHTML = '';
+    items.forEach(function (t) {
+      var l = document.createElement('label');
+      var i = document.createElement('input');
+      i.type = 'checkbox'; i.name = name; i.value = t; i.checked = !!keep[t];
+      l.appendChild(i); l.appendChild(document.createTextNode(t));
+      el.appendChild(l);
+    });
+  }
+  function setRole(role) {
+    var r = form.querySelector('input[name=role][value="' + role + '"]');
+    if (r) r.checked = true;
+    chips(document.getElementById('skills'), 'skills', SKILLS[role]);
+    chips(document.getElementById('domains'), 'domains', DOMAINS[role]);
+    document.getElementById('builtLabel').textContent = BUILT[role];
+  }
+  form.querySelectorAll('input[name=role]').forEach(function (r) {
+    r.addEventListener('change', function () { setRole(r.value); });
+  });
+  document.querySelectorAll('[data-role]').forEach(function (a) {
+    a.addEventListener('click', function () { setRole(a.getAttribute('data-role')); });
+  });
+  setRole(location.hash === '#hardware' ? 'hardware' : 'software');
+
+  var built = form.elements.built;
+  built.addEventListener('input', function () { document.getElementById('builtCount').textContent = built.value.length; });
+
+  // resume picker
+  var drop = document.getElementById('drop');
+  var fileIn = form.elements.resume;
+  function showFile() {
+    var f = fileIn.files && fileIn.files[0];
+    drop.classList.toggle('has', !!f);
+    document.getElementById('dropTitle').textContent = f ? f.name : 'Drop your resume here, or tap to choose';
+    document.getElementById('dropSub').textContent = f ? (f.size / 1024 / 1024).toFixed(2) + ' MB' : 'PDF or Word · up to 4 MB';
+  }
+  fileIn.addEventListener('change', showFile);
+  ['dragenter', 'dragover'].forEach(function (e) { drop.addEventListener(e, function () { drop.classList.add('over'); }); });
+  ['dragleave', 'drop'].forEach(function (e) { drop.addEventListener(e, function () { drop.classList.remove('over'); }); });
+
+  function fail(msg, field) {
+    err.textContent = msg; err.hidden = false;
+    if (field && field.focus) field.focus();
+  }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    err.hidden = true;
+    var el = form.elements;
+    if (el.fullName.value.trim().length < 2) return fail('Enter your full name.', el.fullName);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(el.email.value.trim())) return fail('Enter a valid email address.', el.email);
+    if (!/^\+?[0-9][0-9\s-]{8,15}$/.test(el.phone.value.trim())) return fail('Enter a valid phone number.', el.phone);
+    if (!el.branch.value) return fail('Pick your branch.', el.branch);
+    if (el.built.value.trim().length < 30) return fail('Tell us about something you have built (a few lines at least).', el.built);
+    var f = fileIn.files && fileIn.files[0];
+    if (!f) return fail('Attach your resume (PDF or Word).', fileIn);
+    if (!/\.(pdf|docx?)$/i.test(f.name)) return fail('Resume must be a PDF or Word document.', fileIn);
+    if (f.size > 4 * 1024 * 1024) return fail('Resume is too large. Keep it under 4 MB.', fileIn);
+    if (!el.consent.checked) return fail('Please agree to us storing your application.', el.consent);
+
+    submit.disabled = true;
+    var label = submit.firstChild.textContent;
+    submit.firstChild.textContent = 'Sending… ';
+    var ctl = new AbortController();
+    var t = setTimeout(function () { ctl.abort(); }, 45000);
+    fetch('/api/careers/apply', { method: 'POST', body: new FormData(form), signal: ctl.signal })
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { ok: r.ok, j: j }; }); })
+      .then(function (res) {
+        if (!res.ok) throw new Error(res.j.error || 'Could not send your application. Please try again.');
+        document.getElementById('okName').textContent = el.fullName.value.trim().split(/\s+/)[0];
+        box.classList.add('done');
+        box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      })
+      .catch(function (x) {
+        fail(x.name === 'AbortError' ? 'That took too long. Check your connection and try again.' : x.message);
+      })
+      .then(function () {
+        clearTimeout(t);
+        submit.disabled = false;
+        submit.firstChild.textContent = label;
+      });
+  });
+})();
+</script>
+</body>
+</html>

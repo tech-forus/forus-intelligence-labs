@@ -9,48 +9,60 @@ Live at **https://forusintelligencelabs.com**
 
 ## What this is
 
-A single self-contained static page. No build step, no dependencies, no framework.
-`index.html` holds the markup, the styles and ~30 lines of vanilla JS (sticky-nav state,
-`IntersectionObserver` scroll reveal, current year). Open the file in a browser and it works.
+A static site (no build step, no framework) plus one small API for careers.
 
 ```
 .
-├── index.html        # the entire site
+├── index.html                 # home page
+├── careers/index.html         # /careers: openings + application form
+├── admin/index.html           # /admin: applications dashboard (noindex, password)
 ├── assets/
-│   ├── favicon.svg   # browser tab mark
-│   ├── og.svg        # social preview card, source
-│   └── og.png        # 1200x630 render of the above; this is what og:image points at
-├── CNAME             # custom domain for GitHub Pages
-├── .nojekyll         # skip Jekyll processing on Pages
-└── README.md
+│   ├── site.css / site.js     # shared styles and nav/drawer/reveal script
+│   ├── favicon.svg, og.svg, og.png
+├── netlify/
+│   ├── functions/careers.mjs  # /api/careers/* (Netlify Function)
+│   └── lib/                   # handlers, scoring, file checks, auth (unit tested)
+├── tests/careers.test.mjs     # npm test
+├── scripts/dev-server.mjs     # local preview with a working API (in-memory)
+├── scripts/hash-password.mjs  # make a new admin password hash
+├── netlify.toml, robots.txt, sitemap.xml, CNAME
 ```
+
+## Careers system
+
+- **Apply** (`/careers`): role, contact, education, experience, skills, domains, links,
+  "what you have built", resume (PDF/DOC/DOCX, max 4 MB). The file type is checked from
+  its bytes, not its name. Honeypot field + 5 applications/hour per IP.
+- **Storage**: Netlify Blobs, store `careers` (`app/<id>` JSON, `resume/<id>` file).
+  Nothing goes to the FreightCompare backend or its MongoDB.
+- **Scoring** (`netlify/lib/scoring.mjs`): every application gets three 0-100 fit scores,
+  each with the signals that produced it, from the form answers plus resume text:
+  - *FreightCompare*: MERN + logistics/freight/supply chain (top priority)
+  - *ForusBiz*: MERN + ERP/accounting/inventory/GST
+  - *Hardware*: PCB, embedded, power/BMS, CAD/fab, plus proof of real builds
+  Branch criteria: software = CSE/IT/EEE, hardware = EEE/ECE. Other branches can still
+  apply and are flagged, not blocked.
+- **Admin** (`/admin`, user `tech`): tabs per track ranked by score, filters (branch,
+  experience, min score, status, tags, starred, full-text incl. resume), detail panel,
+  status + notes, resume viewer, CSV export, delete. Sessions are random tokens in the
+  blob store (12 h). The repo is public, so only an scrypt hash of the password is here.
+  **Rotate:** `node scripts/hash-password.mjs "<new>"` and set the output as
+  `ADMIN_PASSWORD_HASH` in Netlify → Site configuration → Environment variables.
 
 ## Local preview
 
 ```bash
-python -m http.server 8000
-# then open http://localhost:8000
+npm install
+npm test                       # API + scoring tests
+node scripts/dev-server.mjs    # http://localhost:8787 (site + careers API, in-memory)
 ```
-
-Or just double-click `index.html` — there is nothing to compile.
 
 ## Deploying
 
-### GitHub Pages
-1. Push this repo to GitHub.
-2. **Settings → Pages → Source:** `Deploy from a branch`, branch `main`, folder `/ (root)`.
-3. **Settings → Pages → Custom domain:** `forusintelligencelabs.com` (the `CNAME` file already declares it).
-4. At your DNS provider, point the apex `A` records at GitHub Pages:
-   `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`
-   and a `CNAME` for `www` → `<account>.github.io`.
-5. Enable **Enforce HTTPS** once the certificate is issued.
-
-> As of the last check, `forusintelligencelabs.com` had no DNS records resolving.
-> Step 4 is what makes the site reachable.
-
-### Anywhere else
-Netlify, Vercel, Cloudflare Pages or S3 all work with zero configuration —
-publish directory is the repo root.
+Hosted on **Netlify** (the domain's A record points at Netlify). Netlify must build from
+this GitHub repo so the function in `netlify/functions` is deployed with the site;
+a drag-and-drop deploy ships the static pages only and the careers form will not work.
+Publish directory is the repo root; `netlify.toml` has the rest.
 
 ## Content sourcing
 
@@ -73,14 +85,14 @@ Deliberate choices worth knowing about:
 
 ## Editing notes
 
-- **Colours** live in the `:root` block at the top of `<style>`. The parent identity is
+- **Colours** live in the `:root` block at the top of `assets/site.css`. The parent identity is
   intentionally neutral graphite; each venture carries its own accent
   (`--fc` blue + amber, `--fb` violet + pink), sampled from the live products.
 - **Adding a third venture:** copy an `<article class="vcard">` block, give it a new
   modifier class, and define `--glow` plus `.rule` gradient stops for it.
 - **Animation** respects `prefers-reduced-motion`, and hover effects are disabled
   under `@media (hover: none)` so nothing sticks on a touchscreen.
-- **Phone layout** lives in the `PHONE` block at the end of `<style>`. Breakpoints are
+- **Phone layout** lives in the `PHONE` block of `assets/site.css`. Breakpoints are
   900px (nav drawer takes over), 760px (single column, full-width buttons), 520px and
   400px. Safe-area insets are handled for notched devices via `env(safe-area-inset-*)`.
 
