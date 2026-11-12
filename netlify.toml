@@ -1,0 +1,13 @@
+# TEMPORARY (2026-11-12): the domain moved to Cloudflare, but DNS resolvers can cache the
+# old Netlify address for up to ~11 h (BigRock's TTL). Until then Netlify keeps serving the
+# same static site, and forwards the careers API to the Cloudflare Worker so applications
+# land in the same place. Delete this file and the Netlify site after 2026-11-14.
+[build]
+  publish = "public"
+  command = "echo static"
+
+[[redirects]]
+  from = "/api/*"
+  to = "https://forus-intelligence-labs.tech-5cd.workers.dev/api/:splat"
+  status = 200
+  force = true
