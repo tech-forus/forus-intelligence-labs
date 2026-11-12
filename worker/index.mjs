@@ -14,12 +14,27 @@ export default {
       url.protocol = "https:";
       return Response.redirect(url.toString(), 301);
     }
+    if (url.hostname === `careers.${APEX}` && url.protocol === "http:") {
+      url.protocol = "https:";
+      return Response.redirect(url.toString(), 301);
+    }
     if (url.pathname.startsWith("/api/careers/")) {
       return handle(request, {
         store: kvStore(env.CAREERS),
         ip: request.headers.get("cf-connecting-ip") || "",
         env,
       });
+    }
+    // careers lives at careers.<apex>; the old /careers path redirects there
+    if (url.hostname === APEX && /^\/careers\/?$/.test(url.pathname)) {
+      return Response.redirect(`https://careers.${APEX}/${url.search}`, 301);
+    }
+    if (url.hostname === `careers.${APEX}`) {
+      if (url.pathname === "/" || url.pathname === "/index.html") {
+        url.pathname = "/careers/";
+        return env.ASSETS.fetch(new Request(url, request));
+      }
+      if (/^\/careers\/?$/.test(url.pathname)) return Response.redirect(`https://careers.${APEX}/${url.search}`, 301);
     }
     return env.ASSETS.fetch(request);
   },
