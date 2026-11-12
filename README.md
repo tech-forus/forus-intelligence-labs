@@ -10,7 +10,7 @@ Live at **https://forusintelligencelabs.com**
 ## What this is
 
 A static site (no build step, no framework) plus one small careers API, hosted on
-**Cloudflare Pages** (static files from `public/`, API from `functions/`).
+**Cloudflare Workers** (static assets from `public/`, API in `worker/index.mjs`).
 
 ```
 .
@@ -20,7 +20,7 @@ A static site (no build step, no framework) plus one small careers API, hosted o
 │   ├── admin/index.html          # /admin: applications dashboard (noindex, password)
 │   ├── assets/                   # site.css, site.js, favicon, og image
 │   ├── _headers, robots.txt, sitemap.xml
-├── functions/api/careers/[[path]].js   # /api/careers/* (Pages Function)
+├── worker/index.mjs              # Worker: /api/careers/* + static assets
 ├── lib/careers/                  # handlers, scoring, validation, auth, KV adapter
 ├── tests/careers.test.mjs        # npm test
 ├── scripts/dev-server.mjs        # quick local preview (Node, in-memory)
@@ -47,21 +47,22 @@ A static site (no build step, no framework) plus one small careers API, hosted o
   panel, status + notes, resume viewer, CSV export, delete. Sessions are random tokens in
   KV (12 h). Only a salted hash of the (long, random) password is in this public repo.
   **Rotate:** `node scripts/hash-password.mjs` generates a new password + hash; set the
-  hash as `ADMIN_PASSWORD_HASH` in Pages → Settings → Variables and secrets.
+  hash as `ADMIN_PASSWORD_HASH` in the Worker → Settings → Variables and secrets.
 
 ## Local preview
 
 ```bash
 npm install
 npm test                                  # API + scoring tests
-npx wrangler pages dev --port 8788        # real Cloudflare runtime + local KV
+npx wrangler dev                          # real Cloudflare runtime + local KV
 node scripts/dev-server.mjs               # or: plain Node preview on :8787
 ```
 
 ## Deploying
 
-Cloudflare Pages project connected to this GitHub repo: every push to `main` deploys.
-Build command: none. Build output directory: `public`. Bindings come from `wrangler.toml`.
+Cloudflare **Worker with static assets** (`worker/index.mjs` + `public/`), connected to this
+GitHub repo through Workers Builds: every push to `main` runs `npx wrangler deploy`.
+Bindings (KV `CAREERS`, `ASSETS`) come from `wrangler.toml`.
 DNS for forusintelligencelabs.com is on Cloudflare (apex + www → the Pages project).
 Keep the MX / SPF / DKIM / Google verification records: email runs on Google + Titan.
 

@@ -1,9 +1,17 @@
-# Cloudflare Pages project: static site in public/, API in functions/.
+# Cloudflare Worker with static assets. Deployed by Workers Builds on every push to main
+# (deploy command: npx wrangler deploy).
 name = "forus-intelligence-labs"
-pages_build_output_dir = "public"
+main = "worker/index.mjs"
 compatibility_date = "2025-09-01"
 compatibility_flags = ["nodejs_compat"]
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
 
 [[kv_namespaces]]
 binding = "CAREERS"
 id = "25cb3763c2e443738c956eff69d8c22f"
+
+[observability]
+enabled = true
