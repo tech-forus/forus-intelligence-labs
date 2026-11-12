@@ -67,6 +67,14 @@ All rules live in `lib/careers/policy.mjs`:
   `CAREERS_FROM_EMAIL` in wrangler.toml to a sender verified in that account. Until both are
   set, emails wait in the queue (discards still happen). Caps: 10 per run, 40 per day.
 
+**Take-home assignments** (`lib/careers/assignment.mjs`, /admin -> Assignments): one PDF and
+email text per role, stored only in KV (`assignment/<role>`, `assignment-file/<role>`), never in
+this public repo. With auto-send on, every new applicant who meets the academic bar (**keep**)
+gets the email with the PDF attached on the next hourly run; the deadline is counted from the
+send date (default 12 days, India time). Cancel or **Send now** from the applicant's card;
+**Send assignment** sends it by hand to anyone else (older applications are never backfilled).
+Never sent twice. **Send test** mails the team address. Submissions go to `CAREERS_REPLY_TO`.
+
 **Import from resume** (`public/assets/resume-parse.js`, unit tested): the applicant drops
 their resume first; the browser reads it (pdf.js / JSZip) and fills name, contact, links,
 degree, branch, college, year, marks, experience, skills and domains for them to check.

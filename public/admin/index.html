@@ -131,6 +131,20 @@ input.t:focus,select.t:focus,textarea.t:focus{outline:0;border-color:#5b8def;box
 .rej-card h4{margin:0 0 2px;font-size:15px}
 .rej-card .sub{font-size:12.5px;color:var(--muted);margin:0 0 10px}
 .rej-card .acts{margin-top:10px}
+.tab.asg{--acc:#fbbf24}
+.st.assignment-sent{color:#fde68a;border-color:rgba(251,191,36,.4)}
+.asg-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.asg-card{border:1px solid var(--line-soft);background:var(--bg-2);border-radius:14px;padding:18px;display:grid;gap:12px;align-content:start}
+.asg-card h3{margin:0;font-size:16px;display:flex;align-items:center;gap:10px}
+.asg-card .lbl{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--muted)}
+.asg-card textarea.t{min-height:70px;resize:vertical}
+.asg-file{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13px;color:var(--text-2);border:1px dashed var(--line);border-radius:10px;padding:10px 12px}
+.switch{display:flex;align-items:center;gap:10px;font-size:13.5px;cursor:pointer}
+.switch input{width:18px;height:18px;accent-color:#34d399}
+.on-pill{font-size:11px;font-weight:650;padding:3px 8px;border-radius:999px;border:1px solid}
+.on-pill.on{color:#34d399;border-color:rgba(52,211,153,.4)}.on-pill.off{color:var(--muted);border-color:var(--line)}
+.preview{width:100%;height:520px;border:1px solid var(--line);border-radius:10px;background:#f4f5f7}
+@media(max-width:900px){.asg-grid{grid-template-columns:1fr}}
 @media(max-width:1000px){
   .filters{grid-template-columns:1fr 1fr 1fr}
   .filters label:first-child{grid-column:1/-1}
@@ -180,6 +194,7 @@ input.t:focus,select.t:focus,textarea.t:focus{outline:0;border-color:#5b8def;box
       <button class="tab hw" role="tab" data-view="hardware"><b>Hardware makers</b><span>Builds + electronics &middot; <em id="n-hw">0</em></span></button>
       <button class="tab all" role="tab" data-view="all"><b>All applications</b><span>Newest first &middot; <em id="n-all">0</em></span></button>
       <button class="tab rej" role="tab" data-view="rejections"><b>Rejections</b><span>Discarded, with reasons &middot; <em id="n-rej">0</em></span></button>
+      <button class="tab asg" role="tab" data-view="assignments"><b>Assignments</b><span>Take-home tasks &middot; <em id="n-asg">0</em> sent</span></button>
     </div>
 
     <div class="banner" id="mailBanner" hidden></div>
@@ -211,7 +226,9 @@ input.t:focus,select.t:focus,textarea.t:focus{outline:0;border-color:#5b8def;box
     forusbiz: { label: 'ForusBiz', cls: 'fb' },
     hardware: { label: 'Hardware', cls: 'hw' }
   };
-  var state = { apps: [], rejections: [], statuses: [], bar: null, delayHours: 24, emailReady: true, view: 'freightcompare', tags: {}, open: null, full: {} };
+  var state = { apps: [], rejections: [], statuses: [], bar: null, delayHours: 24, emailReady: true, view: 'freightcompare', tags: {}, open: null, full: {}, asg: {}, submitTo: '' };
+  var KIND = { discard: 'Discard', regret: 'Email', closing: 'Email', assignment: 'Assignment' };
+  function kindLabel(k) { return KIND[k] || 'Email'; }
 
   // ---- token (session only; private windows may block storage)
   var token = null;
@@ -279,7 +296,10 @@ input.t:focus,select.t:focus,textarea.t:focus{outline:0;border-color:#5b8def;box
       sel.innerHTML = '<option value="">Any</option>' + state.statuses.map(function (s) { return '<option>' + esc(s) + '</option>'; }).join('');
       sel.value = cur;
       buildTags();
-      return api('/rejections').then(function (r) { state.rejections = r.rejections || []; });
+      return Promise.all([
+        api('/rejections').then(function (r) { state.rejections = r.rejections || []; }),
+        api('/assignments').then(function (r) { state.asg = r.roles || {}; state.submitTo = r.submitTo || ''; })
+      ]);
     }).then(function () { render(); }).catch(function (x) {
       if (x.message !== 'signed out') $('list').innerHTML = '<div class="empty">Could not load: ' + esc(x.message) + '</div>';
     });
@@ -356,8 +376,10 @@ input.t:focus,select.t:focus,textarea.t:focus{outline:0;border-color:#5b8def;box
     $('n-hw').textContent = state.apps.filter(function (a) { return a.role === 'hardware'; }).length;
     $('n-all').textContent = state.apps.length;
     $('n-rej').textContent = state.rejections.length;
-    var isRej = v === 'rejections';
+    $('n-asg').textContent = state.apps.filter(function (a) { return a.assignment && a.assignment.status === 'sent'; }).length;
+    var isRej = v === 'rejections' || v === 'assignments';
     $('filters').hidden = isRej; $('tagbar').hidden = isRej;
+    if (v === 'assignments') return renderAssignments();
     if (isRej) return renderRejections();
     $('total').textContent = state.apps.length + ' total';
 
@@ -374,7 +396,8 @@ input.t:focus,select.t:focus,textarea.t:focus{outline:0;border-color:#5b8def;box
       if (a.scores && !a.scores.eligibleBranch) tags += '<span class="tag warn">Branch outside criteria</span>';
       var ac = a.screening && a.screening.academics;
       if (ac) tags = '<span class="acad ' + (ac.passes ? 'ok' : 'no') + '" title="10th / 12th / CGPA vs the bar">Academics ' + ac.met + '/3</span>' + tags;
-      if (a.pending) tags += '<span class="pend">' + (a.pending.kind === 'discard' ? 'Discard' : 'Email') + ' ' + dueIn(a.pending.dueAt) + '</span>';
+      if (a.pending) tags += '<span class="pend">' + kindLabel(a.pending.kind) + ' ' + dueIn(a.pending.dueAt) + '</span>';
+      else if (a.assignment && a.assignment.status === 'sent') tags += '<span class="tag warn">Assignment sent</span>';
       else if (a.mail && a.mail.status === 'sent') tags += '<span class="tag">Emailed</span>';
       return '<div class="row" tabindex="0" data-id="' + esc(a.id) + '">' +
         '<div class="score ' + scoreCls(s) + '" title="' + esc(trackName ? 'Best fit: ' + trackName : 'Fit score') + '">' + s + '</div>' +
@@ -388,7 +411,7 @@ input.t:focus,select.t:focus,textarea.t:focus{outline:0;border-color:#5b8def;box
 
   function dueIn(iso) {
     var ms = Date.parse(iso) - Date.now();
-    if (ms <= 0) return 'due now';
+    if (ms <= 0) return 'next hourly run';
     var mins = Math.ceil(ms / 60000), h = Math.floor(mins / 60), m = mins % 60;
     return 'in ' + (h ? h + 'h ' : '') + m + 'm';
   }
@@ -409,6 +432,83 @@ input.t:focus,select.t:focus,textarea.t:focus{outline:0;border-color:#5b8def;box
         '<button class="b danger" type="button" data-delrej="' + esc(r.id) + '" style="margin-left:auto">Delete record</button></div></div>';
     }).join('');
   }
+  // ---- assignments (take-home task per role)
+  function fmtSize(n) { return n ? (n / 1024 < 1024 ? Math.round(n / 1024) + ' KB' : (n / 1048576).toFixed(1) + ' MB') : ''; }
+  function renderAssignments() {
+    $('count').textContent = 'Applicants who meet the academic bar get their role’s assignment automatically on the next hourly run. You can cancel it from their card until then, or send it by hand.';
+    var roles = Object.keys(state.asg);
+    $('list').innerHTML = '<div class="asg-grid">' + roles.map(function (role) {
+      var c = state.asg[role], f = c.file;
+      var sent = state.apps.filter(function (a) { return a.role === role && a.assignment && a.assignment.status === 'sent'; }).length;
+      var queued = state.apps.filter(function (a) { return a.role === role && a.pending && a.pending.kind === 'assignment'; }).length;
+      return '<form class="asg-card" data-role="' + esc(role) + '">' +
+        '<h3>' + esc(c.roleTitle) + ' <span class="on-pill ' + (c.enabled && f ? 'on">Auto-send on' : 'off">Auto-send off') + '</span></h3>' +
+        '<p class="meta" style="margin:0">' + sent + ' sent' + (queued ? ' &middot; ' + queued + ' waiting for the next run' : '') + '</p>' +
+        '<div class="asg-file">' + (f ? '<b>' + esc(f.fileName) + '</b><span>' + fmtSize(f.size) + ' &middot; uploaded ' + fmtDate(f.uploadedAt) + '</span>' +
+          '<button class="b" type="button" data-asg-open="' + esc(role) + '">Open PDF</button>' : '<span>No PDF uploaded yet. Nothing is sent for this role until you upload one.</span>') +
+          '<label class="b" style="margin-left:auto">' + (f ? 'Replace PDF' : 'Upload PDF') + '<input type="file" accept="application/pdf,.pdf" data-asg-file="' + esc(role) + '" hidden /></label></div>' +
+        '<label class="switch"><input type="checkbox" name="enabled"' + (c.enabled ? ' checked' : '') + ' /> Send automatically to applicants who meet the bar</label>' +
+        '<label class="lbl">Deadline (days after sending)<input class="t" name="deadlineDays" type="number" min="1" max="60" value="' + esc(c.deadlineDays) + '" style="max-width:120px" /></label>' +
+        '<label class="lbl">Task name (shown after "complete a technical assignment:")<input class="t" name="title" value="' + esc(c.title) + '" placeholder="e.g. building an MVP Voice Agent" /></label>' +
+        '<label class="lbl">What the PDF covers<textarea class="t" name="about">' + esc(c.about) + '</textarea></label>' +
+        '<label class="lbl">What to submit (one per line)<textarea class="t" name="submit" rows="4">' + esc((c.submit || []).join('\n')) + '</textarea></label>' +
+        '<label class="lbl">Extra note (optional)<textarea class="t" name="note">' + esc(c.note) + '</textarea></label>' +
+        '<div class="acts"><button class="b pri" type="submit">Save</button>' +
+          '<button class="b" type="button" data-asg-preview="' + esc(role) + '">Preview email</button>' +
+          '<button class="b" type="button" data-asg-test="' + esc(role) + '"' + (f ? '' : ' disabled') + '>Send test to ' + esc(state.submitTo || 'team') + '</button>' +
+          '<span class="meta" data-asg-msg="' + esc(role) + '"></span></div>' +
+        '<div data-asg-prev="' + esc(role) + '"></div>' +
+      '</form>';
+    }).join('') + '</div>';
+  }
+  function asgMsg(role, t) { var m = document.querySelector('[data-asg-msg="' + role + '"]'); if (m) m.textContent = t; }
+  $('list').addEventListener('submit', function (e) {
+    var f = e.target.closest('.asg-card'); if (!f) return;
+    e.preventDefault();
+    var role = f.getAttribute('data-role');
+    asgMsg(role, 'Saving…');
+    var el = f.elements;
+    api('/assignments/' + role, { method: 'PUT', body: JSON.stringify({
+      enabled: el.namedItem('enabled').checked, deadlineDays: el.namedItem('deadlineDays').value, title: el.namedItem('title').value,
+      about: el.namedItem('about').value, submit: el.namedItem('submit').value, note: el.namedItem('note').value
+    }) }).then(function (j) {
+      state.asg[role] = Object.assign(state.asg[role], j.settings);
+      render(); asgMsg(role, j.warning || 'Saved');
+    }).catch(function (x) { asgMsg(role, x.message); });
+  });
+  $('list').addEventListener('change', function (e) {
+    var inp = e.target.closest('[data-asg-file]'); if (!inp || !inp.files[0]) return;
+    var role = inp.getAttribute('data-asg-file'), file = inp.files[0];
+    asgMsg(role, 'Uploading…');
+    file.arrayBuffer().then(function (buf) {
+      return api('/assignments/' + role + '/file', { method: 'PUT', body: buf, headers: { 'x-file-name': encodeURIComponent(file.name), 'content-type': 'application/pdf' } });
+    }).then(function (j) { state.asg[role].file = j.file; render(); asgMsg(role, 'PDF uploaded'); })
+      .catch(function (x) { asgMsg(role, x.message); });
+  });
+  $('list').addEventListener('click', function (e) {
+    var o = e.target.closest('[data-asg-open]'), p = e.target.closest('[data-asg-preview]'), t = e.target.closest('[data-asg-test]');
+    if (o) {
+      var w = window.open('', '_blank');
+      api('/assignments/' + o.getAttribute('data-asg-open') + '/file', { raw: true }).then(function (r) { return r.blob(); })
+        .then(function (b) { var u = URL.createObjectURL(b); if (w) w.location.href = u; setTimeout(function () { URL.revokeObjectURL(u); }, 60000); })
+        .catch(function () { if (w) w.close(); });
+    }
+    if (p) {
+      var role = p.getAttribute('data-asg-preview'), box = document.querySelector('[data-asg-prev="' + role + '"]');
+      if (box.firstChild) { box.innerHTML = ''; return; }
+      api('/assignments/' + role + '/preview').then(function (j) {
+        box.innerHTML = '<p class="meta" style="margin:0 0 6px">Subject: <b>' + esc(j.subject) + '</b> (saved settings, sample name)</p><iframe class="preview" sandbox title="Email preview"></iframe>';
+        box.querySelector('iframe').srcdoc = j.html;
+      }).catch(function (x) { asgMsg(role, x.message); });
+    }
+    if (t) {
+      var r2 = t.getAttribute('data-asg-test');
+      t.disabled = true; asgMsg(r2, 'Sending…');
+      api('/assignments/' + r2 + '/test', { method: 'POST' }).then(function (j) { asgMsg(r2, 'Test sent to ' + j.to); })
+        .catch(function (x) { asgMsg(r2, x.message); }).then(function () { t.disabled = false; });
+    }
+  });
+
   $('list').addEventListener('click', function (e) {
     var b = e.target.closest('[data-delrej]'); if (!b) return;
     e.stopPropagation();
@@ -512,8 +612,20 @@ input.t:focus,select.t:focus,textarea.t:focus{outline:0;border-color:#5b8def;box
         render(); drawPanel(Object.assign(a, j.application), resumeText);
       }).catch(function (x) { $('pMsg').textContent = x.message; });
     });
+    if ($('pSendAsg')) $('pSendAsg').addEventListener('click', function () {
+      var extra = a.pending && a.pending.kind !== 'assignment' ? ' This also cancels the pending ' + kindLabel(a.pending.kind).toLowerCase() + '.' : '';
+      if (!confirm('Send the ' + a.roleTitle + ' assignment PDF to ' + a.email + ' now?' + extra)) return;
+      var btn = $('pSendAsg'); btn.disabled = true;
+      api('/applications/' + encodeURIComponent(a.id) + '/send-assignment', { method: 'POST' }).then(function (j) {
+        var i = state.apps.findIndex(function (x) { return x.id === a.id; });
+        if (i !== -1 && j.application) state.apps[i] = j.application;
+        render(); drawPanel(Object.assign(a, j.application), resumeText);
+      }).catch(function (x) { btn.disabled = false; $('pMsg').textContent = x.message; });
+    });
     if ($('pRunNow')) $('pRunNow').addEventListener('click', function () {
-      var what = a.pending.kind === 'discard' ? 'discard this application now (resume deleted) and send the closing email' : 'send the "kept on file" email now';
+      var what = a.pending.kind === 'discard' ? 'discard this application now (resume deleted) and send the closing email'
+        : a.pending.kind === 'assignment' ? 'send the assignment PDF to ' + a.email + ' now'
+        : 'send the "kept on file" email now';
       if (!confirm('This will ' + what + '. Continue?')) return;
       api('/applications/' + encodeURIComponent(a.id) + '/run-action', { method: 'POST' }).then(function (j) {
         if (!j.application) { closePanel(); return load(); }
@@ -541,18 +653,23 @@ input.t:focus,select.t:focus,textarea.t:focus{outline:0;border-color:#5b8def;box
     var boxes = (ac.checks || []).map(function (c) {
       return '<div class="chk3 ' + (c.met ? 'ok' : 'no') + '"><b>' + (c.value === null ? '\u2014' : c.value + c.unit) + '</b><span>' + c.label + ' &middot; bar ' + c.min + c.unit + '</span></div>';
     }).join('');
-    var verdict = sc.action === 'keep' ? 'Meets the academic bar (' + ac.met + '/3).' :
+    var verdict = sc.action === 'keep' ? 'Meets the academic bar (' + ac.met + '/3)' + (a.pending && a.pending.kind === 'assignment' ? ': the assignment goes out on the next hourly run.' : '.') :
       sc.action === 'regret' ? 'Below the academic bar (' + ac.met + '/3): kept on file, gets the "we will keep your resume" email.' :
       'Below the academic bar and no relevant skills: will be discarded and sent a closing email.';
-    var pend = a.pending ? '<div class="acts" style="margin-top:12px"><span class="pend">' + (a.pending.kind === 'discard' ? 'Discard' : 'Email') + ' ' + dueIn(a.pending.dueAt) + '</span>' +
-      '<button class="b" type="button" id="pCancel">Cancel ' + (a.pending.kind === 'discard' ? 'discard' : 'email') + '</button>' +
-      '<button class="b" type="button" id="pRunNow">Do it now</button></div>' : '';
+    var pend = a.pending ? '<div class="acts" style="margin-top:12px"><span class="pend">' + kindLabel(a.pending.kind) + ' ' + dueIn(a.pending.dueAt) + '</span>' +
+      '<button class="b" type="button" id="pCancel">Cancel ' + kindLabel(a.pending.kind).toLowerCase() + '</button>' +
+      '<button class="b" type="button" id="pRunNow">' + (a.pending.kind === 'assignment' ? 'Send now' : 'Do it now') + '</button></div>' : '';
+    var cfg = state.asg[a.role], as = a.assignment;
+    var asg = as && as.status === 'sent'
+      ? '<p class="meta" style="margin:10px 0 0;color:#fde68a">Assignment sent ' + fmtDate(as.sentAt) + ' &middot; deadline ' + esc(as.deadlineLabel || fmtDate(as.deadline)) + (as.manual ? ' &middot; sent by hand' : '') + '</p>'
+      : (as ? '<p class="meta" style="margin:10px 0 0">Assignment: ' + esc(as.status) + (as.note ? ' (' + esc(as.note) + ')' : '') + '</p>' : '') +
+        (cfg && cfg.file && !(a.pending && a.pending.kind === 'assignment') ? '<div class="acts" style="margin-top:10px"><button class="b" type="button" id="pSendAsg">Send assignment</button></div>' : '');
     var em = a.mail ? '<p class="meta" style="margin:10px 0 0">Email: ' + esc(a.mail.status) + (a.mail.note ? ' (' + esc(a.mail.note) + ')' : '') + ' &middot; ' + fmtDate(a.mail.at) + '</p>' : '';
     var ov = sc.overridden ? '<p class="meta" style="margin:10px 0 0">Automatic action cancelled by admin on ' + fmtDate(sc.overridden) + '.</p>' : '';
     return '<div class="card"><h3>Screening</h3><div class="checks3">' + boxes + '</div>' +
       '<p style="margin:0 0 10px;font-size:14px">' + esc(verdict) + '</p>' +
       (sc.reasons && sc.reasons.length ? '<ul class="reasons">' + sc.reasons.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : '') +
-      pend + em + ov + '</div>';
+      pend + em + ov + asg + '</div>';
   }
 
   function patch(id, body, okMsg) {
