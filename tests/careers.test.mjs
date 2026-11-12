@@ -57,6 +57,7 @@ const good = {
   domains: ["Logistics / freight"], built: "Built a freight rate comparison tool for transporters in Delhi.",
   consent: "yes", github: "github.com/test",
   resumeText: "MERN developer, logistics and freight TMS",
+  class10: "92", class12: "88", cgpa: "8.4",
 };
 
 test("sniffs resume types from bytes, not names", () => {

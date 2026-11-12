@@ -49,6 +49,28 @@ A static site (no build step, no framework) plus one small careers API, hosted o
   **Rotate:** `node scripts/hash-password.mjs` generates a new password + hash; set the
   hash as `ADMIN_PASSWORD_HASH` in the Worker → Settings → Variables and secrets.
 
+## Screening (academic bar, emails, rejections)
+
+All rules live in `lib/careers/policy.mjs`:
+- **Academic bar:** 10th >= 85%, 12th >= 85%, CGPA >= 8.0 (CGPA marks like 9.2 are converted
+  x 9.5; a degree % is converted / 9.5). Missing marks count as not met.
+- **keep** (2 or 3 of 3): normal application.
+- **regret** (0-1 of 3, but relevant skills, or resume unreadable): stays in /admin with its
+  scores (status `below-bar`) and gets the "we have kept your resume on file, no need to
+  re-apply" email.
+- **discard** (0-1 of 3 AND no relevant skills, resume readable): after the delay the resume
+  is deleted, a record with contact details, marks, scores and the reasons is kept under
+  /admin -> Rejections, and a polite closing email goes out.
+- Both automatic actions wait `ACTION_DELAY_HOURS` (24 h). /admin shows the countdown with
+  **Cancel** and **Do it now**. An hourly cron (`[triggers]` in wrangler.toml) runs the queue.
+- Emails: Brevo, own account. `npx wrangler secret put CAREERS_BREVO_KEY`, and set
+  `CAREERS_FROM_EMAIL` in wrangler.toml to a sender verified in that account. Until both are
+  set, emails wait in the queue (discards still happen). Caps: 10 per run, 40 per day.
+
+**Import from resume** (`public/assets/resume-parse.js`, unit tested): the applicant drops
+their resume first; the browser reads it (pdf.js / JSZip) and fills name, contact, links,
+degree, branch, college, year, marks, experience, skills and domains for them to check.
+
 ## Local preview
 
 ```bash

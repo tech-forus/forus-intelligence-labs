@@ -56,7 +56,7 @@ input.t:focus,select.t:focus,textarea.t:focus{outline:0;border-color:#5b8def;box
 .tab[aria-selected=true]{border-color:var(--acc,#5b8def);background:color-mix(in srgb,var(--acc,#5b8def) 10%,var(--bg-2))}
 .tab.fc{--acc:var(--fc)}.tab.fb{--acc:var(--fb)}.tab.hw{--acc:var(--hw)}.tab.all{--acc:#9aa3b5}
 
-.filters{display:grid;grid-template-columns:2fr repeat(5,1fr) auto;gap:10px;align-items:end;margin-bottom:12px}
+.filters{display:grid;grid-template-columns:2fr repeat(6,1fr) auto;gap:10px;align-items:end;margin-bottom:12px}
 .filters label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--muted);min-width:0}
 .filters .chk{flex-direction:row;align-items:center;gap:8px;min-height:42px;color:var(--text-2);font-size:13px;white-space:nowrap}
 .filters .chk input{width:17px;height:17px;accent-color:#3b82f6}
@@ -115,6 +115,22 @@ input.t:focus,select.t:focus,textarea.t:focus{outline:0;border-color:#5b8def;box
 .acts{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
 .links{display:flex;flex-wrap:wrap;gap:8px}
 
+.acad{font-size:11px;font-weight:650;padding:3px 8px;border-radius:6px;border:1px solid;white-space:nowrap}
+.acad.ok{color:#34d399;border-color:rgba(52,211,153,.35)}
+.acad.no{color:#fca5a5;border-color:rgba(248,113,113,.3)}
+.pend{font-size:11px;padding:3px 8px;border-radius:6px;border:1px dashed rgba(251,191,36,.5);color:var(--warn);white-space:nowrap}
+.banner{border:1px solid rgba(251,191,36,.35);background:rgba(251,191,36,.06);color:#fde68a;border-radius:12px;padding:10px 14px;font-size:13px;margin-bottom:14px}
+.tab.rej{--acc:#f87171}
+.checks3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
+.chk3{border:1px solid var(--line-soft);border-radius:10px;padding:10px 12px}
+.chk3 b{display:block;font-size:18px}
+.chk3 span{font-size:12px;color:var(--muted)}
+.chk3.ok b{color:#34d399}.chk3.no b{color:#fca5a5}
+.reasons{margin:0;padding-left:18px;display:grid;gap:5px;font-size:13.5px;color:var(--text-2)}
+.rej-card{border:1px solid var(--line-soft);background:var(--bg-2);border-radius:var(--r);padding:14px 16px}
+.rej-card h4{margin:0 0 2px;font-size:15px}
+.rej-card .sub{font-size:12.5px;color:var(--muted);margin:0 0 10px}
+.rej-card .acts{margin-top:10px}
 @media(max-width:1000px){
   .filters{grid-template-columns:1fr 1fr 1fr}
   .filters label:first-child{grid-column:1/-1}
@@ -125,7 +141,7 @@ input.t:focus,select.t:focus,textarea.t:focus{outline:0;border-color:#5b8def;box
 @media(max-width:620px){
   .top-in,.wrap{padding-left:16px;padding-right:16px}
   .filters{grid-template-columns:1fr 1fr}
-  .tracks{grid-template-columns:1fr}
+  .tracks,.checks3{grid-template-columns:1fr}
   .kv{grid-template-columns:1fr;gap:2px}
   .kv dd{margin-bottom:8px}
   .p-head,.p-body{padding-left:16px;padding-right:16px}
@@ -163,14 +179,17 @@ input.t:focus,select.t:focus,textarea.t:focus{outline:0;border-color:#5b8def;box
       <button class="tab fb" role="tab" data-view="forusbiz"><b>ForusBiz fit</b><span>MERN + ERP &middot; <em id="n-fb">0</em></span></button>
       <button class="tab hw" role="tab" data-view="hardware"><b>Hardware makers</b><span>Builds + electronics &middot; <em id="n-hw">0</em></span></button>
       <button class="tab all" role="tab" data-view="all"><b>All applications</b><span>Newest first &middot; <em id="n-all">0</em></span></button>
+      <button class="tab rej" role="tab" data-view="rejections"><b>Rejections</b><span>Discarded, with reasons &middot; <em id="n-rej">0</em></span></button>
     </div>
 
-    <div class="filters">
+    <div class="banner" id="mailBanner" hidden></div>
+    <div class="filters" id="filters">
       <label>Search<input class="t" id="q" type="search" placeholder="Name, email, college, skill, resume text&hellip;" /></label>
       <label>Branch<select class="t" id="fBranch"><option value="">Any</option><option>CSE</option><option>IT</option><option>EEE</option><option>ECE</option><option>Other</option></select></label>
       <label>Min. experience<select class="t" id="fExp"><option value="0">Any</option><option value="1">1+ yrs</option><option value="2">2+ yrs</option><option value="3">3+ yrs</option><option value="5">5+ yrs</option></select></label>
       <label>Min. score<select class="t" id="fScore"><option value="0">Any</option><option value="40">40+</option><option value="60">60+</option><option value="75">75+</option><option value="85">85+</option></select></label>
       <label>Status<select class="t" id="fStatus"><option value="">Any</option></select></label>
+      <label>Academics<select class="t" id="fAcad"><option value="">Any</option><option value="pass">Meets bar (2+ of 3)</option><option value="3">All 3</option><option value="fail">Below bar</option></select></label>
       <label class="chk"><input type="checkbox" id="fElig" /> Branch fits role</label>
       <label class="chk"><input type="checkbox" id="fStar" /> Starred</label>
     </div>
@@ -192,7 +211,7 @@ input.t:focus,select.t:focus,textarea.t:focus{outline:0;border-color:#5b8def;box
     forusbiz: { label: 'ForusBiz', cls: 'fb' },
     hardware: { label: 'Hardware', cls: 'hw' }
   };
-  var state = { apps: [], statuses: [], view: 'freightcompare', tags: {}, open: null, full: {} };
+  var state = { apps: [], rejections: [], statuses: [], bar: null, delayHours: 24, emailReady: true, view: 'freightcompare', tags: {}, open: null, full: {} };
 
   // ---- token (session only; private windows may block storage)
   var token = null;
@@ -252,12 +271,16 @@ input.t:focus,select.t:focus,textarea.t:focus{outline:0;border-color:#5b8def;box
     return api('/applications').then(function (j) {
       state.apps = j.applications || [];
       state.statuses = j.statuses || [];
+      state.bar = j.bar; state.delayHours = j.delayHours; state.emailReady = j.emailReady;
+      var mb = $('mailBanner');
+      mb.hidden = !!j.emailReady;
+      mb.textContent = 'Emails are not set up yet: "kept on file" and closing emails stay queued until the Brevo key and sender are configured. Discards still happen on schedule.';
       var sel = $('fStatus'), cur = sel.value;
       sel.innerHTML = '<option value="">Any</option>' + state.statuses.map(function (s) { return '<option>' + esc(s) + '</option>'; }).join('');
       sel.value = cur;
       buildTags();
-      render();
-    }).catch(function (x) {
+      return api('/rejections').then(function (r) { state.rejections = r.rejections || []; });
+    }).then(function () { render(); }).catch(function (x) {
       if (x.message !== 'signed out') $('list').innerHTML = '<div class="empty">Could not load: ' + esc(x.message) + '</div>';
     });
   }
@@ -295,7 +318,7 @@ input.t:focus,select.t:focus,textarea.t:focus{outline:0;border-color:#5b8def;box
   function filtered() {
     var q = $('q').value.trim().toLowerCase();
     var br = $('fBranch').value, exp = +$('fExp').value, min = +$('fScore').value, st = $('fStatus').value;
-    var elig = $('fElig').checked, star = $('fStar').checked;
+    var elig = $('fElig').checked, star = $('fStar').checked, acad = $('fAcad').value;
     var tags = Object.keys(state.tags).filter(function (t) { return state.tags[t]; });
     var v = state.view;
     var out = state.apps.filter(function (a) {
@@ -306,6 +329,10 @@ input.t:focus,select.t:focus,textarea.t:focus{outline:0;border-color:#5b8def;box
       if (st && a.status !== st) return false;
       if (elig && !(a.scores && a.scores.eligibleBranch)) return false;
       if (star && !a.starred) return false;
+      var ac = a.screening && a.screening.academics;
+      if (acad === 'pass' && !(ac && ac.passes)) return false;
+      if (acad === '3' && !(ac && ac.met === 3)) return false;
+      if (acad === 'fail' && !(ac && !ac.passes)) return false;
       if (tags.length && !tags.every(function (t) { return (a.scores && a.scores.tags || []).indexOf(t) !== -1; })) return false;
       if (q) {
         var hit = haystack(a).indexOf(q) !== -1 || (state.full[a.id] && (state.full[a.id].resumeText || '').toLowerCase().indexOf(q) !== -1);
@@ -328,6 +355,10 @@ input.t:focus,select.t:focus,textarea.t:focus{outline:0;border-color:#5b8def;box
     $('n-fb').textContent = $('n-fc').textContent;
     $('n-hw').textContent = state.apps.filter(function (a) { return a.role === 'hardware'; }).length;
     $('n-all').textContent = state.apps.length;
+    $('n-rej').textContent = state.rejections.length;
+    var isRej = v === 'rejections';
+    $('filters').hidden = isRej; $('tagbar').hidden = isRej;
+    if (isRej) return renderRejections();
     $('total').textContent = state.apps.length + ' total';
 
     var rows = filtered();
@@ -341,6 +372,10 @@ input.t:focus,select.t:focus,textarea.t:focus{outline:0;border-color:#5b8def;box
       var trackName = v === 'all' ? (TRACK[a.scores && a.scores.best] || {}).label : '';
       var tags = (a.scores && a.scores.tags || []).map(function (t) { return '<span class="tag">' + esc(t) + '</span>'; }).join('');
       if (a.scores && !a.scores.eligibleBranch) tags += '<span class="tag warn">Branch outside criteria</span>';
+      var ac = a.screening && a.screening.academics;
+      if (ac) tags = '<span class="acad ' + (ac.passes ? 'ok' : 'no') + '" title="10th / 12th / CGPA vs the bar">Academics ' + ac.met + '/3</span>' + tags;
+      if (a.pending) tags += '<span class="pend">' + (a.pending.kind === 'discard' ? 'Discard' : 'Email') + ' ' + dueIn(a.pending.dueAt) + '</span>';
+      else if (a.mail && a.mail.status === 'sent') tags += '<span class="tag">Emailed</span>';
       return '<div class="row" tabindex="0" data-id="' + esc(a.id) + '">' +
         '<div class="score ' + scoreCls(s) + '" title="' + esc(trackName ? 'Best fit: ' + trackName : 'Fit score') + '">' + s + '</div>' +
         '<div class="who"><b>' + (a.starred ? '<span class="star">&#9733;</span> ' : '') + esc(a.fullName) + '</b><span>' + esc(a.roleTitle) + (trackName ? ' &middot; best for ' + esc(trackName) : '') + '</span></div>' +
@@ -351,12 +386,46 @@ input.t:focus,select.t:focus,textarea.t:focus{outline:0;border-color:#5b8def;box
     }).join('');
   }
 
+  function dueIn(iso) {
+    var ms = Date.parse(iso) - Date.now();
+    if (ms <= 0) return 'due now';
+    var mins = Math.ceil(ms / 60000), h = Math.floor(mins / 60), m = mins % 60;
+    return 'in ' + (h ? h + 'h ' : '') + m + 'm';
+  }
+  function renderRejections() {
+    $('count').textContent = state.rejections.length + ' discarded. Resumes deleted; contact details, marks and reasons kept.';
+    if (!state.rejections.length) { $('list').innerHTML = '<div class="empty">No rejections yet.</div>'; return; }
+    $('list').innerHTML = state.rejections.map(function (r) {
+      var ac = r.academics || { checks: [] };
+      var marks = (ac.checks || []).map(function (c) { return c.label + ' ' + (c.value === null ? '\u2014' : c.value + c.unit); }).join(' \u00b7 ');
+      var em = r.mail || {};
+      return '<div class="rej-card"><h4>' + esc(r.fullName) + ' <span class="st rejected">' + esc(r.roleTitle) + '</span></h4>' +
+        '<p class="sub"><a href="mailto:' + esc(r.email) + '">' + esc(r.email) + '</a> &middot; ' + esc(r.phone) + ' &middot; ' + esc(r.branch) + ' &middot; ' +
+        esc(r.college || '') + ' &middot; applied ' + fmtDate(r.submittedAt) + ', discarded ' + fmtDate(r.discardedAt) + '</p>' +
+        '<p class="meta" style="margin:0 0 8px">' + esc(marks) + ' &middot; fit FC ' + esc(r.scores && r.scores.freightcompare) + ' / FB ' + esc(r.scores && r.scores.forusbiz) + ' / HW ' + esc(r.scores && r.scores.hardware) + '</p>' +
+        '<b style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)">Why rejected</b>' +
+        '<ul class="reasons">' + (r.reasons || []).map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' +
+        '<div class="acts"><span class="meta">Closing email: ' + esc(em.status || 'queued') + (em.note ? ' (' + esc(em.note) + ')' : '') + '</span>' +
+        '<button class="b danger" type="button" data-delrej="' + esc(r.id) + '" style="margin-left:auto">Delete record</button></div></div>';
+    }).join('');
+  }
+  $('list').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-delrej]'); if (!b) return;
+    e.stopPropagation();
+    var id = b.getAttribute('data-delrej');
+    if (!confirm('Delete this rejection record permanently?')) return;
+    api('/rejections/' + encodeURIComponent(id), { method: 'DELETE' }).then(function () {
+      state.rejections = state.rejections.filter(function (r) { return r.id !== id; });
+      render();
+    });
+  }, true);
+
   $('tabs').addEventListener('click', function (e) {
     var t = e.target.closest('.tab'); if (!t) return;
     state.view = t.getAttribute('data-view');
     render();
   });
-  ['q', 'fBranch', 'fExp', 'fScore', 'fStatus', 'fElig', 'fStar'].forEach(function (id) {
+  ['q', 'fBranch', 'fExp', 'fScore', 'fStatus', 'fElig', 'fStar', 'fAcad'].forEach(function (id) {
     $(id).addEventListener(id === 'q' ? 'input' : 'change', render);
   });
   $('list').addEventListener('click', function (e) { var r = e.target.closest('.row'); if (r) openPanel(r.getAttribute('data-id')); });
@@ -406,6 +475,7 @@ input.t:focus,select.t:focus,textarea.t:focus{outline:0;border-color:#5b8def;box
         '<div class="card"><h3>Fit scores</h3><div class="tracks">' +
           (a.role === 'hardware' ? track(a, 'hardware') + track(a, 'freightcompare') + track(a, 'forusbiz') : track(a, 'freightcompare') + track(a, 'forusbiz') + track(a, 'hardware')) +
         '</div>' + (a.scores && !a.scores.eligibleBranch ? '<p class="meta" style="color:var(--warn);margin:10px 0 0">Branch ' + esc(a.branch) + ' is outside the stated criteria for this role.</p>' : '') + '</div>' +
+        screeningCard(a) +
         '<div class="card"><h3>Review</h3><div class="acts" style="margin-bottom:10px">' +
           '<select class="t" id="pStatus" style="width:auto">' + statusOpts + '</select>' +
           '<button class="b" type="button" id="pStar">' + (a.starred ? '&#9733; Starred' : '&#9734; Star') + '</button>' +
@@ -435,6 +505,23 @@ input.t:focus,select.t:focus,textarea.t:focus{outline:0;border-color:#5b8def;box
       '</div>';
 
     $('pClose').addEventListener('click', closePanel);
+    if ($('pCancel')) $('pCancel').addEventListener('click', function () {
+      api('/applications/' + encodeURIComponent(a.id) + '/cancel-action', { method: 'POST' }).then(function (j) {
+        var i = state.apps.findIndex(function (x) { return x.id === a.id; });
+        if (i !== -1) state.apps[i] = j.application;
+        render(); drawPanel(Object.assign(a, j.application), resumeText);
+      }).catch(function (x) { $('pMsg').textContent = x.message; });
+    });
+    if ($('pRunNow')) $('pRunNow').addEventListener('click', function () {
+      var what = a.pending.kind === 'discard' ? 'discard this application now (resume deleted) and send the closing email' : 'send the "kept on file" email now';
+      if (!confirm('This will ' + what + '. Continue?')) return;
+      api('/applications/' + encodeURIComponent(a.id) + '/run-action', { method: 'POST' }).then(function (j) {
+        if (!j.application) { closePanel(); return load(); }
+        var i = state.apps.findIndex(function (x) { return x.id === a.id; });
+        if (i !== -1) state.apps[i] = j.application;
+        render(); drawPanel(Object.assign(a, j.application), resumeText);
+      }).catch(function (x) { $('pMsg').textContent = x.message; });
+    });
     $('pStatus').addEventListener('change', function (e) { patch(a.id, { status: e.target.value }, 'Status saved'); });
     $('pStar').addEventListener('click', function () { patch(a.id, { starred: !a.starred }, '').then(function (u) { if (u) drawPanel(Object.assign(a, u), resumeText); }); });
     $('pSave').addEventListener('click', function () { patch(a.id, { notes: $('pNotes').value }, 'Notes saved'); });
@@ -446,6 +533,26 @@ input.t:focus,select.t:focus,textarea.t:focus{outline:0;border-color:#5b8def;box
         closePanel(); buildTags(); render();
       }).catch(function (x) { $('pMsg').textContent = x.message; });
     });
+  }
+
+  function screeningCard(a) {
+    var sc = a.screening; if (!sc) return '';
+    var ac = sc.academics || { checks: [] };
+    var boxes = (ac.checks || []).map(function (c) {
+      return '<div class="chk3 ' + (c.met ? 'ok' : 'no') + '"><b>' + (c.value === null ? '\u2014' : c.value + c.unit) + '</b><span>' + c.label + ' &middot; bar ' + c.min + c.unit + '</span></div>';
+    }).join('');
+    var verdict = sc.action === 'keep' ? 'Meets the academic bar (' + ac.met + '/3).' :
+      sc.action === 'regret' ? 'Below the academic bar (' + ac.met + '/3): kept on file, gets the "we will keep your resume" email.' :
+      'Below the academic bar and no relevant skills: will be discarded and sent a closing email.';
+    var pend = a.pending ? '<div class="acts" style="margin-top:12px"><span class="pend">' + (a.pending.kind === 'discard' ? 'Discard' : 'Email') + ' ' + dueIn(a.pending.dueAt) + '</span>' +
+      '<button class="b" type="button" id="pCancel">Cancel ' + (a.pending.kind === 'discard' ? 'discard' : 'email') + '</button>' +
+      '<button class="b" type="button" id="pRunNow">Do it now</button></div>' : '';
+    var em = a.mail ? '<p class="meta" style="margin:10px 0 0">Email: ' + esc(a.mail.status) + (a.mail.note ? ' (' + esc(a.mail.note) + ')' : '') + ' &middot; ' + fmtDate(a.mail.at) + '</p>' : '';
+    var ov = sc.overridden ? '<p class="meta" style="margin:10px 0 0">Automatic action cancelled by admin on ' + fmtDate(sc.overridden) + '.</p>' : '';
+    return '<div class="card"><h3>Screening</h3><div class="checks3">' + boxes + '</div>' +
+      '<p style="margin:0 0 10px;font-size:14px">' + esc(verdict) + '</p>' +
+      (sc.reasons && sc.reasons.length ? '<ul class="reasons">' + sc.reasons.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : '') +
+      pend + em + ov + '</div>';
   }
 
   function patch(id, body, okMsg) {

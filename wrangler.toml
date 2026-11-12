@@ -14,5 +14,15 @@ run_worker_first = true
 binding = "CAREERS"
 id = "25cb3763c2e443738c956eff69d8c22f"
 
+[triggers]
+crons = ["17 * * * *"]
+
+# Careers email. The Brevo key is a secret: npx wrangler secret put CAREERS_BREVO_KEY
+# CAREERS_FROM_EMAIL must be a sender verified in that Brevo account.
+[vars]
+CAREERS_FROM_NAME = "Forus Intelligence Labs Careers"
+CAREERS_REPLY_TO = "tech@foruselectric.com"
+CAREERS_FROM_EMAIL = ""
+
 [observability]
 enabled = true

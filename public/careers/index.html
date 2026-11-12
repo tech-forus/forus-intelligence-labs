@@ -99,6 +99,16 @@
 .f-ok p{margin:0 auto;color:var(--text-2);max-width:48ch}
 .apply.done form{display:none}.apply.done .f-ok{display:block}
 [hidden]{display:none!important}
+.import{margin:0 0 28px}
+.drop.imp{border-color:#2e4f8f;background:rgba(59,130,246,.06);padding:30px 18px}
+.drop.imp b{font-size:16px}
+.drop.busy{opacity:.7;pointer-events:none}
+.imp-or{margin:10px 0 0;text-align:center;font-size:13.5px;color:var(--muted)}
+.imp-or a{color:#93b8fb;text-decoration:underline}
+.imp-msg{margin:12px 0 0;font-size:13.5px;padding:10px 12px;border-radius:10px}
+.imp-msg.ok{color:#a7f3d0;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.3)}
+.imp-msg.bad{color:#fde68a;background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.3)}
+.fld input.filled,.fld select.filled{border-color:rgba(52,211,153,.55)}
 
 @media(max-width:900px){.o-cols{grid-template-columns:1fr}.grid3{grid-template-columns:1fr 1fr}}
 @media(max-width:760px){
@@ -296,6 +306,17 @@
           <h2>Apply</h2>
           <p class="sub">Takes about five minutes. A real person on the tech team reads every application.</p>
 
+          <div class="import" id="importBox">
+            <label class="drop imp" id="impDrop">
+              <input type="file" id="impFile" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
+              <b id="impTitle">Start with your resume: we will fill the form for you</b>
+              <span id="impSub">Drop a PDF or Word file, or tap to choose. You can check and edit everything before sending.</span>
+            </label>
+            <p class="imp-or">or <a href="#" id="manualLink">fill it in by hand</a></p>
+            <p class="imp-msg" id="impMsg" role="status" hidden></p>
+          </div>
+          <input type="hidden" name="imported" value="" />
+
           <div class="f-step">
             <h3>1 &middot; Role</h3>
             <div class="role-pick">
@@ -326,6 +347,9 @@
               <label class="fld"><span>Graduation year</span><input name="gradYear" type="number" inputmode="numeric" min="1980" max="2032" placeholder="2024" /></label>
               <label class="fld"><span>College</span><input name="college" maxlength="160" /></label>
               <label class="fld"><span>Years of relevant experience</span><input name="experienceYears" type="number" inputmode="decimal" min="0" max="40" step="0.5" value="0" /></label>
+              <label class="fld"><span>10th marks <em>(% or CGPA)</em></span><input name="class10" type="number" inputmode="decimal" min="0" max="100" step="0.01" required placeholder="e.g. 92.5" /></label>
+              <label class="fld"><span>12th marks <em>(% or CGPA, skip if diploma)</em></span><input name="class12" type="number" inputmode="decimal" min="0" max="100" step="0.01" placeholder="e.g. 91" /></label>
+              <label class="fld"><span>Degree CGPA <em>(or %)</em></span><input name="cgpa" type="number" inputmode="decimal" min="0" max="100" step="0.01" required placeholder="e.g. 8.27" /></label>
               <label class="fld"><span>Notice period <em>(optional)</em></span>
                 <select name="noticePeriod"><option value="">Select</option><option>Immediate</option><option>15 days</option><option>30 days</option><option>60 days</option><option>90 days</option><option>Student / graduating</option></select>
               </label>
@@ -499,6 +523,70 @@
     document.getElementById('dropSub').textContent = f ? (f.size / 1024 / 1024).toFixed(2) + ' MB' : 'PDF or Word · up to 4 MB';
   }
   fileIn.addEventListener('change', showFile);
+
+  // ---- import from resume
+  var impFile = document.getElementById('impFile');
+  var impMsg = document.getElementById('impMsg');
+  var impDrop = document.getElementById('impDrop');
+  ['dragenter', 'dragover'].forEach(function (e) { impDrop.addEventListener(e, function () { impDrop.classList.add('over'); }); });
+  ['dragleave', 'drop'].forEach(function (e) { impDrop.addEventListener(e, function () { impDrop.classList.remove('over'); }); });
+  document.getElementById('manualLink').addEventListener('click', function (e) {
+    e.preventDefault();
+    form.elements.fullName.focus();
+  });
+  function setVal(name, v) {
+    var el = form.elements[name];
+    if (!el || v === undefined || v === null || v === '') return false;
+    if (el.value && !(name === 'experienceYears' && el.value === '0')) return false; // never overwrite what they typed
+    if (el.tagName === 'SELECT' && !Array.prototype.some.call(el.options, function (o) { return (o.value || o.text) === String(v); })) return false;
+    el.value = v;
+    el.classList.add('filled');
+    return true;
+  }
+  function tick(boxId, labels) {
+    var n = 0;
+    document.querySelectorAll('#' + boxId + ' input').forEach(function (i) {
+      if (labels.indexOf(i.value) !== -1 && !i.checked) { i.checked = true; n++; }
+    });
+    return n;
+  }
+  impFile.addEventListener('change', function () {
+    var f = impFile.files && impFile.files[0];
+    if (!f) return;
+    if (!/\.(pdf|docx?)$/i.test(f.name) || f.size > 4 * 1024 * 1024) {
+      impMsg.hidden = false; impMsg.className = 'imp-msg bad';
+      impMsg.textContent = 'Please choose a PDF or Word file under 4 MB.';
+      return;
+    }
+    impDrop.classList.add('busy');
+    document.getElementById('impTitle').textContent = 'Reading ' + f.name + '\u2026';
+    // the same file becomes the attached resume
+    try { var dt = new DataTransfer(); dt.items.add(f); fileIn.files = dt.files; showFile(); } catch (e) {}
+    Promise.all([rawText(f), import('/assets/resume-parse.js')]).then(function (r) {
+      var text = r[0], p = r[1].parseResume(text);
+      var n = 0;
+      // a resume with plenty of electronics and no web stack is probably for the hardware role
+      var sw = (p.skills || []).filter(function (s) { return SKILLS.software.indexOf(s) !== -1; }).length;
+      var hw = (p.skills || []).filter(function (s) { return SKILLS.hardware.indexOf(s) !== -1; }).length;
+      if (sw === 0 && hw >= 3 && form.querySelector('input[name=role]:checked').value === 'software') setRole('hardware');
+      ['fullName', 'email', 'phone', 'city', 'college', 'gradYear', 'class10', 'class12', 'cgpa', 'github', 'linkedin', 'portfolio', 'degree', 'branch', 'experienceYears']
+        .forEach(function (k) { if (setVal(k, p[k])) n++; });
+      n += tick('skills', p.skills || []) + tick('domains', p.domains || []);
+      form.elements.imported.value = text.trim().length > 50 ? 'yes' : '';
+      impMsg.hidden = false;
+      if (text.trim().length < 50) {
+        impMsg.className = 'imp-msg bad';
+        impMsg.textContent = 'We could not read text from this file (it may be a scanned image). It is attached; please fill the form by hand.';
+      } else {
+        impMsg.className = 'imp-msg ok';
+        impMsg.textContent = 'Filled ' + n + ' fields from your resume. Please check them (highlighted in green) and add anything missing, especially what you have built.';
+      }
+      document.getElementById('impTitle').textContent = f.name;
+    }).catch(function () {
+      impMsg.hidden = false; impMsg.className = 'imp-msg bad';
+      impMsg.textContent = 'Could not read that file. It is attached; please fill the form by hand.';
+    }).then(function () { impDrop.classList.remove('busy'); });
+  });
   ['dragenter', 'dragover'].forEach(function (e) { drop.addEventListener(e, function () { drop.classList.add('over'); }); });
   ['dragleave', 'drop'].forEach(function (e) { drop.addEventListener(e, function () { drop.classList.remove('over'); }); });
 
@@ -526,7 +614,7 @@
       for (var i = 1; i <= Math.min(pdf.numPages, 10); i++) pages.push(i);
       return Promise.all(pages.map(function (n) {
         return pdf.getPage(n).then(function (p) { return p.getTextContent(); })
-          .then(function (c) { return c.items.map(function (it) { return it.str; }).join(' '); });
+          .then(function (c) { return c.items.map(function (it) { return it.str + (it.hasEOL ? '\n' : ' '); }).join(''); });
       })).then(function (parts) { return parts.join('\n'); });
     });
   }
@@ -543,6 +631,17 @@
     var s = '', b = new Uint8Array(buf);
     for (var i = 0; i < b.length; i++) s += String.fromCharCode(b[i]);
     return Promise.resolve((s.match(/[\x20-\x7e]{4,}/g) || []).join(' '));
+  }
+  function rawText(file) {
+    var work = file.arrayBuffer().then(function (buf) {
+      var h = new Uint8Array(buf.slice(0, 4));
+      if (h[0] === 0x25 && h[1] === 0x50) return pdfText(buf);
+      if (h[0] === 0x50 && h[1] === 0x4b) return docxText(buf);
+      if (h[0] === 0xd0 && h[1] === 0xcf) return docText(buf);
+      return '';
+    });
+    var timeout = new Promise(function (ok) { setTimeout(function () { ok(''); }, 15000); });
+    return Promise.race([work, timeout]).then(function (t) { return String(t || ''); }, function () { return ''; });
   }
   function resumeText(file) {
     var work = file.arrayBuffer().then(function (buf) {
@@ -572,6 +671,8 @@
     if (!/^\+?[0-9][0-9\s-]{8,15}$/.test(el.phone.value.trim())) return fail('Enter a valid phone number.', el.phone);
     if (!el.branch.value) return fail('Pick your branch.', el.branch);
     if (el.built.value.trim().length < 30) return fail('Tell us about something you have built (a few lines at least).', el.built);
+    if (!(+el.class10.value > 0)) return fail('Enter your 10th marks (% or CGPA).', el.class10);
+    if (!(+el.cgpa.value > 0)) return fail('Enter your degree CGPA or percentage.', el.cgpa);
     var f = fileIn.files && fileIn.files[0];
     if (!f) return fail('Attach your resume (PDF or Word).', fileIn);
     if (!/\.(pdf|docx?)$/i.test(f.name)) return fail('Resume must be a PDF or Word document.', fileIn);
