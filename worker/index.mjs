@@ -1,13 +1,20 @@
-// Cloudflare Worker: serves the static site from public/ (via the assets binding) and
-// handles /api/careers/* itself. Static files are matched first; anything that is not
-// a file (i.e. the API) reaches this fetch handler.
+// Cloudflare Worker for forusintelligencelabs.com. Runs before static assets
+// (run_worker_first in wrangler.toml) so it can redirect http -> https and www -> apex,
+// answers /api/careers/* itself, and hands everything else to the public/ assets.
 import { handle } from "../lib/careers/handlers.mjs";
 import { kvStore } from "../lib/careers/kv-store.mjs";
 
+const APEX = "forusintelligencelabs.com";
+
 export default {
   async fetch(request, env) {
-    const { pathname } = new URL(request.url);
-    if (pathname.startsWith("/api/careers/")) {
+    const url = new URL(request.url);
+    if (url.hostname === `www.${APEX}` || (url.hostname === APEX && url.protocol === "http:")) {
+      url.hostname = APEX;
+      url.protocol = "https:";
+      return Response.redirect(url.toString(), 301);
+    }
+    if (url.pathname.startsWith("/api/careers/")) {
       return handle(request, {
         store: kvStore(env.CAREERS),
         ip: request.headers.get("cf-connecting-ip") || "",

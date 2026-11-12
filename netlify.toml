@@ -1,8 +1,0 @@
-# Legacy host, kept only until the domain moves to Cloudflare Pages (see README).
-[build]
-  publish = "public"
-  command = "echo 'static site, nothing to build'"
-
-[functions]
-  directory = "netlify/functions"
-  node_bundler = "esbuild"

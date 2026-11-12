@@ -2,11 +2,8 @@
   "name": "forus-intelligence-labs",
   "private": true,
   "type": "module",
-  "description": "forusintelligencelabs.com: static site plus the careers API (Netlify Functions + Blobs)",
+  "description": "forusintelligencelabs.com: static site plus the careers API (Cloudflare Worker + KV)",
   "scripts": {
     "test": "node --test tests/*.test.mjs"
-  },
-  "dependencies": {
-    "@netlify/blobs": "10.0.0"
   }
 }
