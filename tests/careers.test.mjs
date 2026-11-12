@@ -1,10 +1,9 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import JSZip from "jszip";
-import { handle } from "../netlify/lib/handlers.mjs";
-import { scoreApplication, matchGroups } from "../netlify/lib/scoring.mjs";
-import { sniffResume, extractText } from "../netlify/lib/files.mjs";
-import { hashPassword, verifyPassword } from "../netlify/lib/auth.mjs";
+import { handle } from "../lib/careers/handlers.mjs";
+import { scoreApplication, matchGroups } from "../lib/careers/scoring.mjs";
+import { sniffResume, tidyText } from "../lib/careers/files.mjs";
+import { hashPassword, verifyPassword } from "../lib/careers/auth.mjs";
 
 // ---- in-memory stand-in for a Netlify Blobs store
 function memStore() {
@@ -57,6 +56,7 @@ const good = {
   branch: "CSE", experienceYears: "3", skills: ["React", "Node.js", "MongoDB", "Express"],
   domains: ["Logistics / freight"], built: "Built a freight rate comparison tool for transporters in Delhi.",
   consent: "yes", github: "github.com/test",
+  resumeText: "MERN developer, logistics and freight TMS",
 };
 
 test("sniffs resume types from bytes, not names", () => {
@@ -66,14 +66,10 @@ test("sniffs resume types from bytes, not names", () => {
   assert.equal(sniffResume(new TextEncoder().encode("<html>not a resume</html>")), null);
 });
 
-test("extracts text from pdf and docx", async () => {
-  const pdfText = await extractText(makePdf("STM32 firmware and KiCad PCB layout"), "pdf");
-  assert.match(pdfText, /KiCad PCB/);
-  const zip = new JSZip();
-  zip.file("word/document.xml", '<w:document><w:body><w:p><w:r><w:t>Supply chain &amp; MERN</w:t></w:r></w:p></w:body></w:document>');
-  const docx = await zip.generateAsync({ type: "uint8array" });
-  assert.equal(await extractText(docx, "docx"), "Supply chain & MERN");
-  assert.equal(await extractText(new Uint8Array([1, 2, 3]), "pdf"), ""); // garbage never throws
+test("resume text from the browser is tidied and capped", () => {
+  assert.equal(tidyText("  KiCad\n\n PCB  "), "KiCad PCB");
+  assert.equal(tidyText(undefined), "");
+  assert.equal(tidyText("x".repeat(50000)).length, 40000);
 });
 
 test("keyword matching respects word edges", () => {
@@ -107,7 +103,7 @@ test("hardware makers score on real build evidence", () => {
 });
 
 test("password hashing round-trips and rejects wrong passwords", () => {
-  const h = hashPassword("correct horse", 1024);
+  const h = hashPassword("correct horse");
   assert.equal(verifyPassword("correct horse", h), true);
   assert.equal(verifyPassword("wrong", h), false);
   assert.equal(verifyPassword("", h), false);
@@ -131,7 +127,7 @@ test("apply -> admin login -> list -> resume -> update -> delete", async () => {
   assert.equal((await handle(new Request(`${base}/api/careers/admin/applications`), ctx)).status, 401);
   assert.equal((await handle(new Request(`${base}/api/careers/admin/applications/${id}/resume`), ctx)).status, 401);
 
-  const h = hashPassword("test-pass", 1024);
+  const h = hashPassword("test-pass");
   process.env.ADMIN_PASSWORD_HASH = h;
   const wrong = await handle(new Request(`${base}/api/careers/admin/login`, { method: "POST", body: JSON.stringify({ username: "tech", password: "nope" }) }), ctx);
   assert.equal(wrong.status, 401);

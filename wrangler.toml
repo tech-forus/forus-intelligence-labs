@@ -1,0 +1,9 @@
+# Cloudflare Pages project: static site in public/, API in functions/.
+name = "forus-intelligence-labs"
+pages_build_output_dir = "public"
+compatibility_date = "2025-09-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[kv_namespaces]]
+binding = "CAREERS"
+id = "25cb3763c2e443738c956eff69d8c22f"

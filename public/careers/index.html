@@ -502,6 +502,62 @@
   ['dragenter', 'dragover'].forEach(function (e) { drop.addEventListener(e, function () { drop.classList.add('over'); }); });
   ['dragleave', 'drop'].forEach(function (e) { drop.addEventListener(e, function () { drop.classList.remove('over'); }); });
 
+  // ---- read the resume's text in the browser (sent alongside the file for screening).
+  // Best effort: any failure just sends '' and the file itself is still uploaded.
+  var PDFJS = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';
+  var JSZIP = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+  var loaded = {};
+  function load(src) {
+    if (!loaded[src]) loaded[src] = new Promise(function (ok, no) {
+      var s = document.createElement('script');
+      s.src = src; s.async = true; s.crossOrigin = 'anonymous';
+      s.onload = ok; s.onerror = no;
+      document.head.appendChild(s);
+    });
+    return loaded[src];
+  }
+  function pdfText(buf) {
+    return load(PDFJS + 'pdf.min.js').then(function () {
+      var lib = window.pdfjsLib;
+      lib.GlobalWorkerOptions.workerSrc = PDFJS + 'pdf.worker.min.js';
+      return lib.getDocument({ data: buf }).promise;
+    }).then(function (pdf) {
+      var pages = [];
+      for (var i = 1; i <= Math.min(pdf.numPages, 10); i++) pages.push(i);
+      return Promise.all(pages.map(function (n) {
+        return pdf.getPage(n).then(function (p) { return p.getTextContent(); })
+          .then(function (c) { return c.items.map(function (it) { return it.str; }).join(' '); });
+      })).then(function (parts) { return parts.join('\n'); });
+    });
+  }
+  function docxText(buf) {
+    return load(JSZIP).then(function () { return window.JSZip.loadAsync(buf); }).then(function (zip) {
+      var f = zip.file('word/document.xml');
+      return f ? f.async('string') : '';
+    }).then(function (xml) {
+      return xml.replace(/<\/w:p>/g, '\n').replace(/<w:tab\/>/g, ' ').replace(/<[^>]+>/g, '')
+        .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&apos;/g, "'");
+    });
+  }
+  function docText(buf) {
+    var s = '', b = new Uint8Array(buf);
+    for (var i = 0; i < b.length; i++) s += String.fromCharCode(b[i]);
+    return Promise.resolve((s.match(/[\x20-\x7e]{4,}/g) || []).join(' '));
+  }
+  function resumeText(file) {
+    var work = file.arrayBuffer().then(function (buf) {
+      var h = new Uint8Array(buf.slice(0, 4));
+      if (h[0] === 0x25 && h[1] === 0x50) return pdfText(buf);
+      if (h[0] === 0x50 && h[1] === 0x4b) return docxText(buf);
+      if (h[0] === 0xd0 && h[1] === 0xcf) return docText(buf);
+      return '';
+    });
+    var timeout = new Promise(function (ok) { setTimeout(function () { ok(''); }, 15000); });
+    return Promise.race([work, timeout]).then(function (t) {
+      return String(t || '').replace(/\s+/g, ' ').trim().slice(0, 40000);
+    }, function () { return ''; });
+  }
+
   function fail(msg, field) {
     err.textContent = msg; err.hidden = false;
     if (field && field.focus) field.focus();
@@ -526,8 +582,13 @@
     var label = submit.firstChild.textContent;
     submit.firstChild.textContent = 'Sending… ';
     var ctl = new AbortController();
-    var t = setTimeout(function () { ctl.abort(); }, 45000);
-    fetch('/api/careers/apply', { method: 'POST', body: new FormData(form), signal: ctl.signal })
+    var t;
+    resumeText(f).then(function (text) {
+      var fd = new FormData(form);
+      fd.set('resumeText', text);
+      t = setTimeout(function () { ctl.abort(); }, 45000);
+      return fetch('/api/careers/apply', { method: 'POST', body: fd, signal: ctl.signal });
+    })
       .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { ok: r.ok, j: j }; }); })
       .then(function (res) {
         if (!res.ok) throw new Error(res.j.error || 'Could not send your application. Please try again.');

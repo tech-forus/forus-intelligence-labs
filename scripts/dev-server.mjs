@@ -7,9 +7,9 @@ import { readFile } from "node:fs/promises";
 import { extname, join, normalize } from "node:path";
 import { Readable } from "node:stream";
 import { fileURLToPath } from "node:url";
-import { handle } from "../netlify/lib/handlers.mjs";
+import { handle } from "../lib/careers/handlers.mjs";
 
-const root = fileURLToPath(new URL("..", import.meta.url));
+const root = fileURLToPath(new URL("../public/", import.meta.url));
 const TYPES = { ".html": "text/html; charset=utf-8", ".css": "text/css", ".js": "text/javascript", ".svg": "image/svg+xml", ".png": "image/png", ".txt": "text/plain", ".xml": "application/xml" };
 
 const mem = new Map();
